@@ -50,6 +50,7 @@ layouts.registerEditor( "ScriptEditor" )
 layouts.registerEditor( "Browser" )
 layouts.registerEditor( "Timeline" )
 layouts.registerEditor( "UIEditor" )
+layouts.registerEditor( "PrimitiveSpreadsheet")
 
 # register some predefined layouts
 
