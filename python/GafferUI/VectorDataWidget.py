@@ -1023,6 +1023,7 @@ class _CompoundDataAccessor( _DataAccessor ) :
 _DataAccessor.registerType( IECore.Color3fVectorData.staticTypeId(), _CompoundDataAccessor )
 _DataAccessor.registerType( IECore.Color4fVectorData.staticTypeId(), _CompoundDataAccessor )
 _DataAccessor.registerType( IECore.V3fVectorData.staticTypeId(), _CompoundDataAccessor )
+_DataAccessor.registerType( IECore.V2fVectorData.staticTypeId(), _CompoundDataAccessor )
 
 class _StringDataAccessor( _DataAccessor ) :
 
@@ -1178,6 +1179,7 @@ _Delegate.registerType( IECore.FloatVectorData.staticTypeId(), _NumericDelegate 
 _Delegate.registerType( IECore.Color3fVectorData.staticTypeId(), _NumericDelegate )
 _Delegate.registerType( IECore.Color4fVectorData.staticTypeId(), _NumericDelegate )
 _Delegate.registerType( IECore.V3fVectorData.staticTypeId(), _NumericDelegate )
+_Delegate.registerType( IECore.V2fVectorData.staticTypeId(), _NumericDelegate )
 
 class _BoolDelegate( _Delegate ) :
 
