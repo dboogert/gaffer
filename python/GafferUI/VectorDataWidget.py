@@ -204,8 +204,9 @@ class VectorDataWidget( GafferUI.Widget ) :
 		# by self.__removeSelection.
 
 		if data is not None :
-			if not isinstance( data, list ) :
-				data = [ data ]
+			if not isinstance( data, dict ) :
+				data = { "foo": data }
+
 			self.__model = _Model( data, self.__tableView, self.getEditable(), self.__headerOverride, self.__columnToolTips, self.__columnEditability )
 			self.__model.dataChanged.connect( Gaffer.WeakMethod( self.__modelDataChanged ) )
 			self.__model.rowsInserted.connect( Gaffer.WeakMethod( self.__emitDataChangedSignal ) )
@@ -816,8 +817,8 @@ class _Model( QtCore.QAbstractTableModel ) :
 
 		self.__columns = []
 		self.__accessors = []
-		for d in self.__data :
-			accessor = _DataAccessor.create( d )
+		for name, d in self.__data.items() :
+			accessor = _DataAccessor.create( d, name = name )
 			assert( accessor is not None )
 			for i in range( 0, accessor.numColumns() ) :
 				self.__columns.append( IECore.Struct( accessor=accessor, relativeColumnIndex=i ) )
@@ -856,7 +857,7 @@ class _Model( QtCore.QAbstractTableModel ) :
 		if parent.isValid() :
 			return 0
 
-		return len( self.__data[0] )
+		return len( self.__data.values()[0] )
 
 	def columnCount( self, parent = QtCore.QModelIndex() ) :
 
@@ -933,9 +934,10 @@ class _Model( QtCore.QAbstractTableModel ) :
 # Qt (QVariant) representation.
 class _DataAccessor( object ) :
 
-	def __init__( self, data ) :
+	def __init__( self, data, heading = ''  ) :
 
 		self.__data = data
+		self.heading = heading
 
 	def data( self ) :
 
@@ -947,7 +949,12 @@ class _DataAccessor( object ) :
 
 	def headerLabel( self, columnIndex ) :
 
-		return [ "X", "Y", "Z" ][columnIndex]
+		if self.heading:
+			h = [ self.heading + ".X", self.heading + ".Y", self.heading + ".Z" ]
+		else:
+			h = [ "X", "Y", "Z" ]
+
+		return h[columnIndex]
 
 	def defaultElement( self ) :
 
@@ -966,13 +973,13 @@ class _DataAccessor( object ) :
 	#################################
 
 	@classmethod
-	def create( cls, data ) :
+	def create( cls, data, name = "" ) :
 
 		typeIds = [ data.typeId() ] + IECore.RunTimeTyped.baseTypeIds( data.typeId() )
 		for typeId in typeIds :
 			creator = cls.__typesToCreators.get( typeId, None )
 			if creator is not None :
-				return creator( data )
+				return creator( data, heading = name )
 
 		return None
 
@@ -994,9 +1001,9 @@ _DataAccessor.registerType( IECore.UInt64VectorData.staticTypeId(), _DataAccesso
 
 class _CompoundDataAccessor( _DataAccessor ) :
 
-	def __init__( self, data ) :
+	def __init__( self, data, heading = "" ) :
 
-		_DataAccessor.__init__( self, data )
+		_DataAccessor.__init__( self, data, heading = heading )
 
 	def numColumns( self ) :
 
@@ -1006,9 +1013,9 @@ class _CompoundDataAccessor( _DataAccessor ) :
 	def headerLabel( self, columnIndex ) :
 
 		if isinstance( self.data(), ( IECore.Color3fVectorData, IECore.Color4fVectorData ) ) :
-			return [ "R", "G", "B", "A" ][columnIndex]
+			return [ self.heading + ".R", self.heading + ".G", self.heading + ".B", self.heading + ".A" ][columnIndex]
 		else :
-			return [ "X", "Y", "Z", "W" ][columnIndex]
+			return [ self.heading + ".X", self.heading + ".Y", self.heading + ".Z", self.heading + ".W" ][columnIndex]
 
 	def setElement( self, rowIndex, columnIndex, value ) :
 
@@ -1132,7 +1139,7 @@ class _Delegate( QtWidgets.QStyledItemDelegate ) :
 		return None
 
 	@classmethod
-	def create( cls, data ) :
+	def create( cls, data, name = "" ) :
 
 		typeIds = [ data.typeId() ] + IECore.RunTimeTyped.baseTypeIds( data.typeId() )
 		for typeId in typeIds :
