@@ -137,9 +137,9 @@ class PrimitiveSpreadsheet( GafferUI.NodeSetEditor ) :
 
                     for primvarName in obj.keys():
                         if obj[primvarName].interpolation in primVars:
-                            primVars[ obj[primvarName].interpolation ].append( obj[primvarName].data )
+                            primVars[ obj[primvarName].interpolation ][primvarName] =  obj[primvarName].data
                         else:
-                            primVars[ obj[primvarName].interpolation ] = [ obj[primvarName].data ]
+                            primVars[ obj[primvarName].interpolation ] = {primvarName : obj[primvarName].data }
 
                     for interpolation, dataArray in primVars.items():
                         if dataArray:
