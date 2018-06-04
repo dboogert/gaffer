@@ -54,7 +54,7 @@ IF ( "${CMAKE_BUILD_TYPE}" MATCHES "Debug" )
 ELSEIF ( "${CMAKE_BUILD_TYPE}" MATCHES "Release" )
   ADD_DEFINITIONS( -DNDEBUG=1 -UDEBUG )
   IF ( NOT WINDOWS )
-    ADD_DEFINITIONS( -pipe -Wall -Werror -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS -Wno-unused-local-typedefs -Wno-strict-aliasing -Wno-maybe-uninitialized ) #-Wno-return-type )
+    ADD_DEFINITIONS( -pipe -Wall  -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS -Wno-unused-local-typedefs -Wno-strict-aliasing -Wno-maybe-uninitialized -Wno-strict-overflow) #-Wno-return-type )
   ENDIF()
 ENDIF()
 
