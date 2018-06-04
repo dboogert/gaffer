@@ -3,11 +3,23 @@
 #include "Gaffer/Context.h"
 #include "GafferScene/ScenePlug.h"
 
-static void BM_ContextBorrowedCopy(benchmark::State& state)
+static void BM_ContextBorrowedCopyStack(benchmark::State& state)
 {
+	const Gaffer::Context c;
 	for (auto _ : state)
 	{
-		const Gaffer::Context* current = Gaffer::Context::current();
+
+		Gaffer::Context stackContext ( c, Gaffer::Context::Borrowed );
+	}
+}
+
+BENCHMARK(BM_ContextBorrowedCopyStack);
+
+static void BM_ContextBorrowedCopy(benchmark::State& state)
+{
+	const Gaffer::Context* current = Gaffer::Context::current();
+	for (auto _ : state)
+	{
 		Gaffer::Context::Ptr ptr = new Gaffer::Context( *current, Gaffer::Context::Borrowed );
 	}
 }
