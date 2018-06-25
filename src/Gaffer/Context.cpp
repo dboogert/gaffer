@@ -117,12 +117,16 @@ Environment g_environment;
 
 static InternedString g_frame( "frame" );
 static InternedString g_framesPerSecond( "framesPerSecond" );
+static InternedString g_yarnId("yarnId");
 
 Context::Context()
 	:	m_changedSignal( nullptr ), m_hashValid( false ), m_canceller( nullptr )
 {
+	static int yarnId = 0;
 	set( g_frame, 1.0f );
 	set( g_framesPerSecond, 24.0f );
+	set ( g_yarnId, yarnId++);
+
 }
 
 Context::Context( const Context &other, Ownership ownership, const IECore::Canceller *canceller )
