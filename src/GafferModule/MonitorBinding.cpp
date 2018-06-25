@@ -44,6 +44,7 @@
 #include "Gaffer/PerformanceMonitor.h"
 #include "Gaffer/Plug.h"
 #include "Gaffer/VTuneMonitor.h"
+#include "Gaffer/TracingMonitor.h"
 
 #include "boost/format.hpp"
 
@@ -232,5 +233,10 @@ void GafferModule::bindMonitor()
 	}
 
 #endif //GAFFER_VTUNE
+
+
+	{
+		scope s = class_<TracingMonitor, bases<Monitor>, boost::noncopyable>( "TracingMonitor" );
+	}
 
 }
