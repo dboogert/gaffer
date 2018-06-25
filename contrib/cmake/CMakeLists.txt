@@ -433,7 +433,7 @@ target_link_libraries( GafferDelight ${BASE_LIBS} Gaffer GafferDispatch GafferSc
 add_library( _GafferDelight MODULE ${GAFFERDELIGHT_CXX_MODULE_FILES} )
 target_link_libraries( _GafferDelight ${BASE_LIBS} ${BASE_PYTHON_LIBS} GafferScene GafferBindings GafferDispatch GafferDelight GafferBindings )
 
-add_executable( GafferBenchmark  ${GAFFER_SOURCE_DIR}/src/GafferBenchmark/main.cpp)
+add_executable( GafferBenchmark  ${GAFFER_SOURCE_DIR}/src/GafferBenchmark/main.cpp ${GAFFER_SOURCE_DIR}/src/GafferBenchmark/ContextBenchmark.cpp)
 
 target_include_directories( GafferBenchmark PUBLIC /home/don/dev/runtime/benchmark/1.4.0/include)
 target_link_libraries( GafferBenchmark  ${BASE_LIBS} Gaffer /home/don/dev/runtime/benchmark/1.4.0/lib/libbenchmark.a)
