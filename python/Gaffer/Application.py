@@ -79,6 +79,12 @@ class Application( IECore.Parameterised ) :
 					allowEmptyString = True
 				),
 
+				IECore.BoolParameter(
+					name = "trace",
+					description = "Enable tracing",
+					defaultValue = False,
+				),
+
 			]
 
 		)
@@ -99,6 +105,10 @@ class Application( IECore.Parameterised ) :
 			return 0
 
 		args = self.parameters().getValidatedValue()
+
+		if args["trace"].value :
+			self.__tracingMonitor = Gaffer.TracingMonitor()
+			self.__tracingMonitor.setActive( True )
 
 		if args["profileFileName"].value :
 			contextDict = {
