@@ -50,6 +50,7 @@ enum TypeId
 	LevelSetOffsetTypeId = 110955,
 	PointsGridToPointsId = 110956,
 	DeleteGridsTypeId = 110957,
+	ScatterPointsTypeId = 110958,
 	LastTypeId = 110974
 };
 
