@@ -41,6 +41,7 @@
 #include "GafferVDB/MeshToLevelSet.h"
 #include "GafferVDB/PointsGridToPoints.h"
 #include "GafferVDB/DeleteGrids.h"
+#include "GafferVDB/ScatterPoints.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -55,5 +56,6 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<LevelSetOffset>();
 	GafferBindings::DependencyNodeClass<PointsGridToPoints>();
 	GafferBindings::DependencyNodeClass<DeleteGrids>();
+	GafferBindings::DependencyNodeClass<ScatterPoints>();
 
 }
