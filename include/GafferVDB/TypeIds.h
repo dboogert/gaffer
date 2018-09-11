@@ -51,6 +51,7 @@ enum TypeId
 	PointsGridToPointsId = 110956,
 	DeleteGridsTypeId = 110957,
 	ScatterPointsTypeId = 110958,
+	AdvectGridsTypeId = 110959,
 	LastTypeId = 110974
 };
 
