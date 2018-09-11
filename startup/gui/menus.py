@@ -468,6 +468,7 @@ nodeMenu.append( "/VDB/Level Set Offset", GafferVDB.LevelSetOffset, searchText =
 nodeMenu.append( "/VDB/Points Grid To Points", GafferVDB.PointsGridToPoints, searchText = "PointsGridToPoints" )
 nodeMenu.append( "/VDB/Delete Grids", GafferVDB.DeleteGrids, searchText = "DeleteGrids" )
 nodeMenu.append( "/VDB/Scatter Points", GafferVDB.ScatterPoints, searchText = "ScatterPoints" )
+nodeMenu.append( "/VDB/Advect Grids", GafferVDB.AdvectGrids, searchText = "AdvectGrids" )
 
 # Dispatch nodes
 
