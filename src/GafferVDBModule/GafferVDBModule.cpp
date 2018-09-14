@@ -43,6 +43,7 @@
 #include "GafferVDB/DeleteGrids.h"
 #include "GafferVDB/ScatterPoints.h"
 #include "GafferVDB/AdvectGrids.h"
+#include "GafferVDB/MathOp.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -59,4 +60,5 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<DeleteGrids>();
 	GafferBindings::DependencyNodeClass<ScatterPoints>();
     GafferBindings::DependencyNodeClass<AdvectGrids>();
+	GafferBindings::DependencyNodeClass<MathOp>();
 }
