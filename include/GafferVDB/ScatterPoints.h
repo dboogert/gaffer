@@ -61,20 +61,17 @@ namespace GafferVDB
         Gaffer::IntPlug *outputTypePlug();
         const Gaffer::IntPlug *outputTypePlug() const;
 
-        Gaffer::IntPlug *modePlug();
-        const Gaffer::IntPlug *modePlug() const;
+        Gaffer::StringPlug *gridPlug();
+        const Gaffer::StringPlug *gridPlug() const;
+
+        Gaffer::BoolPlug *nonuniformPlug();
+        const Gaffer::BoolPlug *nonuniformPlug() const;
 
         Gaffer::IntPlug *pointCountPlug();
         const Gaffer::IntPlug *pointCountPlug() const;
 
         Gaffer::FloatPlug *probabilityPlug();
         const Gaffer::FloatPlug *probabilityPlug() const;
-
-        Gaffer::BoolPlug *nonuniformPlug();
-        const Gaffer::BoolPlug *nonuniformPlug() const;
-
-        Gaffer::StringPlug *gridPlug();
-        const Gaffer::StringPlug *gridPlug() const;
 
         virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 

@@ -65,11 +65,10 @@ ScatterPoints::ScatterPoints( const std::string &name )
     storeIndexOfNextChild(g_firstPlugIndex);
 
     addChild( new IntPlug( "outputType", Plug::In, 0 ) );
-    addChild( new IntPlug( "mode", Plug::In, 0 ) );
-    addChild( new IntPlug( "pointCount", Plug::In, 0 ) );
-    addChild( new FloatPlug( "probability", Plug::In, 0.0f ) );
-    addChild( new BoolPlug( "nonuniform", Plug::In, false ) );
     addChild( new StringPlug( "grid", Plug::In, "density" ) );
+    addChild( new BoolPlug( "nonuniform", Plug::In, false ) );
+    addChild( new IntPlug( "pointCount", Plug::In, 1000 ) );
+    addChild( new FloatPlug( "probability", Plug::In, 1.0f ) );
 }
 
 ScatterPoints::~ScatterPoints()
@@ -86,62 +85,53 @@ const Gaffer::IntPlug *ScatterPoints::outputTypePlug() const
     return  getChild<IntPlug>( g_firstPlugIndex );
 }
 
-Gaffer::IntPlug *ScatterPoints::modePlug()
-{
-    return  getChild<IntPlug>( g_firstPlugIndex + 1 );
-}
-
-const Gaffer::IntPlug *ScatterPoints::modePlug() const
-{
-    return  getChild<IntPlug>( g_firstPlugIndex + 1 );
-}
-
-Gaffer::IntPlug *ScatterPoints::pointCountPlug()
-{
-    return  getChild<IntPlug>( g_firstPlugIndex + 2 );
-}
-
-const Gaffer::IntPlug *ScatterPoints::pointCountPlug() const
-{
-    return  getChild<IntPlug>( g_firstPlugIndex + 2 );
-}
-
-Gaffer::FloatPlug *ScatterPoints::probabilityPlug()
-{
-    return  getChild<FloatPlug>( g_firstPlugIndex + 3 );
-}
-
-const Gaffer::FloatPlug *ScatterPoints::probabilityPlug() const
-{
-    return  getChild<FloatPlug>( g_firstPlugIndex + 3 );
-}
-
-Gaffer::BoolPlug *ScatterPoints::nonuniformPlug()
-{
-    return  getChild<BoolPlug>( g_firstPlugIndex + 4 );
-}
-
-const Gaffer::BoolPlug *ScatterPoints::nonuniformPlug() const
-{
-    return  getChild<BoolPlug>( g_firstPlugIndex + 4 );
-}
-
 Gaffer::StringPlug *ScatterPoints::gridPlug()
 {
-    return  getChild<StringPlug>( g_firstPlugIndex + 5);
+    return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
 
 const Gaffer::StringPlug *ScatterPoints::gridPlug() const
 {
-    return  getChild<StringPlug>( g_firstPlugIndex + 5);
+    return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
+
+Gaffer::BoolPlug *ScatterPoints::nonuniformPlug()
+{
+    return  getChild<BoolPlug>( g_firstPlugIndex + 2 );
+}
+
+const Gaffer::BoolPlug *ScatterPoints::nonuniformPlug() const
+{
+    return  getChild<BoolPlug>( g_firstPlugIndex + 2 );
+}
+
+Gaffer::IntPlug *ScatterPoints::pointCountPlug()
+{
+    return  getChild<IntPlug>( g_firstPlugIndex + 3 );
+}
+
+const Gaffer::IntPlug *ScatterPoints::pointCountPlug() const
+{
+    return  getChild<IntPlug>( g_firstPlugIndex + 3 );
+}
+
+Gaffer::FloatPlug *ScatterPoints::probabilityPlug()
+{
+    return  getChild<FloatPlug>( g_firstPlugIndex + 4 );
+}
+
+const Gaffer::FloatPlug *ScatterPoints::probabilityPlug() const
+{
+    return  getChild<FloatPlug>( g_firstPlugIndex + 4 );
+}
+
+
 
 void ScatterPoints::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
     SceneElementProcessor::affects( input, outputs );
 
     if( input == outputTypePlug()
-     || input == modePlug()
      || input == pointCountPlug()
      || input == probabilityPlug()
      || input == nonuniformPlug()
@@ -162,7 +152,6 @@ void ScatterPoints::hashProcessedObject( const ScenePath &path, const Gaffer::Co
     SceneElementProcessor::hashProcessedObject( path, context, h );
 
     outputTypePlug()->hash( h );
-    h.append( modePlug()->getValue() );
     h.append( pointCountPlug()->getValue() );
     h.append( probabilityPlug()->getValue() );
     h.append( nonuniformPlug()->getValue() );
@@ -197,13 +186,6 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
         return inputObject;
     }
 
-    PointsWriter pointWriter;
-    std::default_random_engine generator;
-
-    // todo create other scatterer objects depending on parameters
-
-    openvdb::tools::UniformPointScatter<PointsWriter, std::default_random_engine> uniformPointScatter(pointWriter, (openvdb::Index64) pointCountPlug()->getValue(), generator);
-
     std::string gridName = gridPlug()->getValue();
 
     openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
@@ -214,9 +196,25 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
         // todo raise exception
     }
 
+    PointsWriter pointWriter;
+    std::default_random_engine generator;
+
     // todo case to other grid types ( dispatch grid type template function? )
     openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
-    uniformPointScatter( *floatGrid );
+
+    if ( nonuniformPlug()->getValue() )
+    {
+        openvdb::tools::NonUniformPointScatter<PointsWriter, std::default_random_engine> nonuniformPointScatter(pointWriter, probabilityPlug()->getValue(), generator);
+        nonuniformPointScatter ( *floatGrid );
+    }
+    else
+    {
+        openvdb::tools::UniformPointScatter<PointsWriter, std::default_random_engine> uniformPointScatter(pointWriter, (openvdb::Index64) pointCountPlug()->getValue(), generator);
+
+
+        uniformPointScatter( *floatGrid );
+    }
+
 
     IECoreScene::PointsPrimitivePtr pointsPrimitive = new IECoreScene::PointsPrimitive( pointWriter.pointsData );
     return pointsPrimitive;
@@ -242,8 +240,4 @@ Imath::Box3f ScatterPoints::computeProcessedBound( const ScenePath &path, const 
 }
 
 // todo output either PointsPrimitive or VDBPoints (drop down option)
-// delete scatter mode (uniform, non uniform)
-
-// non uniform (probabiliy or probability grid)
-// uniform (num points per active voxel)
 
