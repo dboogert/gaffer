@@ -53,6 +53,7 @@ enum TypeId
 	ScatterPointsTypeId = 110958,
 	AdvectGridsTypeId = 110959,
 	MathOpTypeId = 110960,
+	StatisticsTypeId = 110961,
 	LastTypeId = 110974
 };
 
