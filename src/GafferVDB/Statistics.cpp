@@ -106,6 +106,7 @@ void Statistics::hashProcessedAttributes( const ScenePath &path, const Gaffer::C
 {
 	SceneElementProcessor::hashProcessedAttributes( path, context, h );
 
+	h.append( inPlug()->objectHash( path ) );
 	h.append( gridsPlug()->getValue() );
 }
 
