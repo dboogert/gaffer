@@ -475,6 +475,7 @@ nodeMenu.append( "/VDB/Delete Grids", GafferVDB.DeleteGrids, searchText = "Delet
 nodeMenu.append( "/VDB/Scatter Points", GafferVDB.ScatterPoints, searchText = "ScatterPoints" )
 nodeMenu.append( "/VDB/Advect Grids", GafferVDB.AdvectGrids, searchText = "AdvectGrids" )
 nodeMenu.append( "/VDB/Math Op", GafferVDB.MathOp, searchText = "MathOp" )
+nodeMenu.append( "/VDB/Statistics", GafferVDB.Statistics, searchText = "Statistics" )
 
 # Dispatch nodes
 
