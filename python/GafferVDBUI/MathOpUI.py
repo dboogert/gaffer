@@ -51,8 +51,16 @@ GafferUI.Metadata.registerNode(
         'type' : [
             'description',
             """
-           Type of operation
-            """
+            Type of operation
+            """,
+            "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
+            "preset:gadient", 0,
+            "preset:lapacian", 1,
+            "preset:divergence", 2,
+            "preset:curl", 3,
+            "preset:magnitude", 4,
+            "preset:normalize", 5,
+            "preset:meanCurvature", 6,
         ],
 
     }
