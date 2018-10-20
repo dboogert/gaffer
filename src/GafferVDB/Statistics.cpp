@@ -139,7 +139,8 @@ IECore::ConstCompoundObjectPtr Statistics::computeProcessedAttributes( const Sce
 			newAttributes->members().insert(std::make_pair( std::string("volume_stats:") + gridName + ":max", new IECore::FloatData( stats.max() ) ) );
 			newAttributes->members().insert(std::make_pair( std::string("volume_stats:") + gridName + ":stddev", new IECore::FloatData( stats.stdDev() ) ) );
 
-			openvdb::math::Histogram histogram = openvdb::tools::histogram( grid->cbeginValueOn(), stats.min(), stats.max(), 16 );
+			// todo consider adding plug for histogram bin count.
+			openvdb::math::Histogram histogram = openvdb::tools::histogram( grid->cbeginValueOn(), stats.min(), stats.max(), 32);
 
 			std::vector<float> binValues (histogram.numBins());
 
