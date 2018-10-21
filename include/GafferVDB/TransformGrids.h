@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (c) 2017, John Haddon. All rights reserved.
+//  Copyright (c) 2018, Image Engine Design. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 //        disclaimer in the documentation and/or other materials provided with
 //        the distribution.
 //
-//      * Neither the name of John Haddon nor the names of
+//      * Neither the name of Image Engine Design nor the names of
 //        any other contributors to this software may be used to endorse or
 //        promote products derived from this software without specific prior
 //        written permission.
@@ -34,31 +34,56 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_TYPEIDS_H
-#define GAFFERVDB_TYPEIDS_H
+#ifndef GAFFERVDB_TRANSFORMGRIDS_H
+#define GAFFERVDB_TRANSFORMGRIDS_H
+
+#include "GafferVDB/Export.h"
+#include "GafferVDB/TypeIds.h"
+
+#include "GafferScene/SceneElementProcessor.h"
+
+#include "Gaffer/NumericPlug.h"
+#include "Gaffer/StringPlug.h"
 
 namespace GafferVDB
 {
 
-enum TypeId
-{
-	VDBGridTypeId = 110950, // Obsolete - available for reuse
-	VDBObjectTypeId = 110951, // Obsolete - available for reuse
-	VDBSceneTypeId = 110952, // Obsolete - available for reuse
-	MeshToLevelSetTypeId = 110953,
-	LevelSetToMeshTypeId = 110954,
-	LevelSetOffsetTypeId = 110955,
-	PointsGridToPointsId = 110956,
-	DeleteGridsTypeId = 110957,
-	ScatterPointsTypeId = 110958,
-	AdvectGridsTypeId = 110959,
-	MathOpTypeId = 110960,
-	StatisticsTypeId = 110961,
-	CSGGridsTypeId = 110962,
-	TransformGridsTypeId = 110963,
-	LastTypeId = 110974
-};
+	class GAFFERVDB_API TransformGrids : public GafferScene::SceneElementProcessor
+	{
+
+	public :
+
+		TransformGrids(const std::string &name = defaultName<TransformGrids>() );
+		~TransformGrids();
+
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::TransformGrids, TransformGridsTypeId, GafferScene::SceneElementProcessor );
+
+		Gaffer::StringPlug *gridsPlug();
+		const Gaffer::StringPlug *gridsPlug() const;
+
+		Gaffer::FloatPlug *valuePlug();
+		const Gaffer::FloatPlug *valuePlug() const;
+
+		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
+
+	protected :
+
+		bool processesObject() const override;
+		void hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		IECore::ConstObjectPtr computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const override;
+
+		bool processesBound() const override;
+		void hashProcessedBound( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		Imath::Box3f computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const override;
+
+	private:
+
+		static size_t g_firstPlugIndex;
+	};
+
+	IE_CORE_DECLAREPTR( TransformGrids )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_TYPEIDS_H
+#endif // GAFFERVDB_TRANSFORMGRIDS_H
+
