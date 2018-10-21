@@ -44,6 +44,7 @@
 
 #include "Gaffer/NumericPlug.h"
 #include "Gaffer/StringPlug.h"
+#include "Gaffer/TransformPlug.h"
 
 namespace GafferVDB
 {
@@ -61,8 +62,8 @@ namespace GafferVDB
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
 
-		Gaffer::FloatPlug *valuePlug();
-		const Gaffer::FloatPlug *valuePlug() const;
+		Gaffer::TransformPlug *transformPlug();
+		const Gaffer::TransformPlug *transformPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 

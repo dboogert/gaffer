@@ -42,6 +42,7 @@
 
 #include "IECoreVDB/VDBObject.h"
 
+#include "Gaffer/CompoundNumericPlug.h"
 #include "Gaffer/StringPlug.h"
 
 #include "openvdb/openvdb.h"
@@ -65,7 +66,7 @@ TransformGrids::TransformGrids( const std::string &name )
 	storeIndexOfNextChild(g_firstPlugIndex);
 
 	addChild( new StringPlug( "grids", Plug::In, "*" ) );
-	addChild( new FloatPlug( "value", Plug::In, 0.0 ) );
+	addChild( new TransformPlug( "transform", Plug::In, 0.0 ) );
 }
 
 TransformGrids::~TransformGrids()
@@ -82,21 +83,21 @@ const Gaffer::StringPlug *TransformGrids::gridsPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex  );
 }
 
-Gaffer::FloatPlug *TransformGrids::valuePlug()
+Gaffer::TransformPlug *TransformGrids::transformPlug()
 {
-	return  getChild<FloatPlug>( g_firstPlugIndex +1);
+	return  getChild<TransformPlug>( g_firstPlugIndex + 1 );
 }
 
-const Gaffer::FloatPlug *TransformGrids::valuePlug() const
+const Gaffer::TransformPlug *TransformGrids::transformPlug() const
 {
-	return  getChild<FloatPlug>( g_firstPlugIndex +1);
+	return  getChild<TransformPlug>( g_firstPlugIndex + 1 );
 }
 
 void TransformGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridsPlug() || input == valuePlug()   )
+	if( input == gridsPlug() ||  input == transformPlug() || input->parent() == transformPlug()  )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -112,8 +113,8 @@ void TransformGrids::hashProcessedObject( const ScenePath &path, const Gaffer::C
 {
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
-	h.append( gridsPlug()->hash() );
-	h.append( valuePlug()->hash() );
+	transformPlug()->hash( h );
+	gridsPlug()->hash( h );
 }
 
 IECore::ConstObjectPtr TransformGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -130,9 +131,17 @@ IECore::ConstObjectPtr TransformGrids::computeProcessedObject( const ScenePath &
 	VDBObjectPtr newVDBObject = runTimeCast<VDBObject>(vdbObject->copy());
 	std::vector<std::string> gridNames = newVDBObject->gridNames();
 
-	openvdb::Mat4R transform = openvdb::Mat4R::identity();
-	transform.setTranslation(openvdb::Vec3s( valuePlug()->getValue(), 0, 0));
-	openvdb::tools::GridTransformer transfomer ( transform );
+	auto convert = [](Imath::V3f v) -> openvdb::Vec3R
+	{
+		return openvdb::Vec3R(v[0], v[1],v[2]);
+	};
+
+	openvdb::tools::GridTransformer transfomer (
+			convert( transformPlug()->pivotPlug()->getValue() ),
+			convert( transformPlug()->scalePlug()->getValue() ),
+			convert( transformPlug()->rotatePlug()->getValue() ),
+			convert( transformPlug()->translatePlug()->getValue() )
+			);
 
 	for (const auto &gridName : gridNames )
 	{
