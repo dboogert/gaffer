@@ -123,7 +123,7 @@ void MathOp::hashProcessedObject( const ScenePath &path, const Gaffer::Context *
 
 IECore::ConstObjectPtr MathOp::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
-    const VDBObject *vdbObject = runTimeCast<const VDBObject>(inputObject.get());
+    auto vdbObject = runTimeCast<const VDBObject>(inputObject.get());
     if( !vdbObject )
     {
         return inputObject;
@@ -133,7 +133,6 @@ IECore::ConstObjectPtr MathOp::computeProcessedObject( const ScenePath &path, co
 
     VDBObjectPtr newVDBObject = runTimeCast<VDBObject>(vdbObject->copy());
     std::vector<std::string> gridNames = newVDBObject->gridNames();
-
 
     for (const auto &gridName : gridNames )
     {
