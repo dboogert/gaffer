@@ -125,8 +125,6 @@ const Gaffer::FloatPlug *ScatterPoints::probabilityPlug() const
     return  getChild<FloatPlug>( g_firstPlugIndex + 4 );
 }
 
-
-
 void ScatterPoints::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
     SceneElementProcessor::affects( input, outputs );
@@ -158,7 +156,6 @@ void ScatterPoints::hashProcessedObject( const ScenePath &path, const Gaffer::Co
     h.append( gridPlug()->hash() );
 }
 
-
 class PointsWriter {
 public:
 
@@ -175,8 +172,6 @@ public:
     IECore::V3fVectorDataPtr  pointsData;
     std::vector<Imath::V3f> & points;
 };
-
-
 
 IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
@@ -219,7 +214,6 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
     IECoreScene::PointsPrimitivePtr pointsPrimitive = new IECoreScene::PointsPrimitive( pointWriter.pointsData );
     return pointsPrimitive;
 }
-
 
 bool ScatterPoints::processesBound() const
 {
