@@ -477,6 +477,7 @@ nodeMenu.append( "/VDB/Advect Grids", GafferVDB.AdvectGrids, searchText = "Advec
 nodeMenu.append( "/VDB/Math Op", GafferVDB.MathOp, searchText = "MathOp" )
 nodeMenu.append( "/VDB/Statistics", GafferVDB.Statistics, searchText = "Statistics" )
 nodeMenu.append( "/VDB/CSGGrids", GafferVDB.CSGGrids, searchText = "CSGGrids" )
+nodeMenu.append( "/VDB/TransformGrids", GafferVDB.TransformGrids, searchText = "TransformGrids" )
 
 # Dispatch nodes
 
