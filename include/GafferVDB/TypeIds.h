@@ -54,6 +54,7 @@ enum TypeId
 	AdvectGridsTypeId = 110959,
 	MathOpTypeId = 110960,
 	StatisticsTypeId = 110961,
+	CSGGridsTypeId = 110962,
 	LastTypeId = 110974
 };
 
