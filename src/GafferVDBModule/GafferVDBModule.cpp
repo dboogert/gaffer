@@ -46,6 +46,7 @@
 #include "GafferVDB/MathOp.h"
 #include "GafferVDB/Statistics.h"
 #include "GafferVDB/CsgGrids.h"
+#include "GafferVDB/TransformGrids.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -65,4 +66,5 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<MathOp>();
 	GafferBindings::DependencyNodeClass<Statistics>();
 	GafferBindings::DependencyNodeClass<CSGGrids>();
+	GafferBindings::DependencyNodeClass<TransformGrids>();
 }
