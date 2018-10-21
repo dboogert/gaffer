@@ -115,6 +115,11 @@ IECore::ConstCompoundObjectPtr Statistics::computeProcessedAttributes( const Sce
 
 	auto vdbObject = IECore::runTimeCast<const IECoreVDB::VDBObject> ( inPlug()->object( path ) );
 
+	if ( !vdbObject )
+	{
+		return inputAttributes;
+	}
+
 	std::vector<std::string> gridNames = vdbObject->gridNames();
 	std::string grids = gridsPlug()->getValue();
 
