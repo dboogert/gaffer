@@ -45,5 +45,6 @@ import ScatterPointsUI
 import AdvectGridsUI
 import MathOpUI
 import StatisticsUI
+import CSGGridsUI
 
 __import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )
