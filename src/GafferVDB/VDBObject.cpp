@@ -100,6 +100,7 @@ IECore::ConstObjectPtr VDBObject::computeSource( const Context *context ) const
 	grid->setName( "gridName" );
 
 	grid->setGridClass(openvdb::GRID_FOG_VOLUME);
+	grid->addStatsMetadata();
 
 	vdbObject->insertGrid( grid );
 
