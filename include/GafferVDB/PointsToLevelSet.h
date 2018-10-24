@@ -58,6 +58,12 @@ namespace GafferVDB
 
 		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::PointsToLevelSet, PointsToLevelSetTypeId, GafferScene::SceneElementProcessor );
 
+		GafferScene::ScenePlug *otherPlug();
+		const GafferScene::ScenePlug *otherPlug() const;
+
+		Gaffer::StringPlug *pointsLocationPlug();
+		const Gaffer::StringPlug *pointsLocationPlug() const;
+
 		Gaffer::StringPlug *gridPlug();
 		const Gaffer::StringPlug *gridPlug() const;
 
