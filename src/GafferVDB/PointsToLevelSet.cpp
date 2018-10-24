@@ -225,9 +225,7 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 		return inputObject;
 	}
 
-
 	openvdb::tools::ParticlesToLevelSet<openvdb::FloatGrid> toLevelSet ( *floatGrid );
-
 
 	GafferScene::ScenePlug::ScenePath pointsLocation ;
 	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation);
