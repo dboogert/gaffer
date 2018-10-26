@@ -72,7 +72,6 @@ FilterGrids::~FilterGrids()
 {
 }
 
-
 Gaffer::StringPlug *FilterGrids::gridsPlug()
 {
 	return  getChild<StringPlug>( g_firstPlugIndex );
@@ -83,7 +82,6 @@ const Gaffer::StringPlug *FilterGrids::gridsPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex );
 }
 
-
 Gaffer::IntPlug *FilterGrids::filterTypePlug()
 {
 	return  getChild<IntPlug>( g_firstPlugIndex + 1);
@@ -93,7 +91,6 @@ const Gaffer::IntPlug *FilterGrids::filterTypePlug() const
 {
 	return  getChild<IntPlug>( g_firstPlugIndex + 1);
 }
-
 
 void FilterGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
@@ -118,7 +115,6 @@ void FilterGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Cont
 	filterTypePlug()->hash( h );
 	h.append( gridsPlug()->hash() );
 }
-
 
 IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
