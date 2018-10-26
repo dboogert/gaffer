@@ -42,8 +42,8 @@ namespace GafferVDB
 
 enum TypeId
 {
-	VDBGridTypeId = 110950, // Obsolete - available for reuse
-	VDBObjectTypeId = 110951, // Obsolete - available for reuse
+	ClipTypeId = 110950,
+	VDBObjectTypeId = 110951,
 	VDBSceneTypeId = 110952, // Obsolete - available for reuse
 	MeshToLevelSetTypeId = 110953,
 	LevelSetToMeshTypeId = 110954,
@@ -56,6 +56,13 @@ enum TypeId
 	StatisticsTypeId = 110961,
 	CSGGridsTypeId = 110962,
 	TransformGridsTypeId = 110963,
+	LevelSetFractureTypeId = 110964,
+	PointsToLevelSetTypeId = 110965,
+	SampleTypeId = 110966,
+	FilterGridsTypeId = 110967,
+	LevelSetMeasureTypeId = 110968,
+	LevelSetFilterTypeId = 110969,
+	VolumeToSpheresTypeId = 110970,
 	LastTypeId = 110974
 };
 
