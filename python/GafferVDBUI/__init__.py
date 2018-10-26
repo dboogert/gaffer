@@ -47,5 +47,13 @@ import MathOpUI
 import StatisticsUI
 import CSGGridsUI
 import TransformGridsUI
+import PointsToLevelSetUI
+import VDBObjectUI
+import SampleUI
+import FilterGridsUI
+import LevelSetMeasureUI
+import LevelSetFilterUI
+import VolumeToSpheresUI
+import ClipUI
 
 __import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )

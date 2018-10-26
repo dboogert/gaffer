@@ -47,6 +47,14 @@
 #include "GafferVDB/Statistics.h"
 #include "GafferVDB/CsgGrids.h"
 #include "GafferVDB/TransformGrids.h"
+#include "GafferVDB/PointsToLevelSet.h"
+#include "GafferVDB/VDBObject.h"
+#include "GafferVDB/Sample.h"
+#include "GafferVDB/FilterGrids.h"
+#include "GafferVDB/LevelSetMeasure.h"
+#include "GafferVDB/LevelSetFilter.h"
+#include "GafferVDB/VolumeToSpheres.h"
+#include "GafferVDB/Clip.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -67,4 +75,12 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<Statistics>();
 	GafferBindings::DependencyNodeClass<CSGGrids>();
 	GafferBindings::DependencyNodeClass<TransformGrids>();
+	GafferBindings::DependencyNodeClass<PointsToLevelSet>();
+	GafferBindings::DependencyNodeClass<VDBObject>();
+	GafferBindings::DependencyNodeClass<Sample>();
+	GafferBindings::DependencyNodeClass<FilterGrids>();
+	GafferBindings::DependencyNodeClass<LevelSetMeasure>();
+	GafferBindings::DependencyNodeClass<LevelSetFilter>();
+	GafferBindings::DependencyNodeClass<VolumeToSpheres>();
+	GafferBindings::DependencyNodeClass<Clip>();
 }
