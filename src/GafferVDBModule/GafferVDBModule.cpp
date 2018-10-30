@@ -55,6 +55,8 @@
 #include "GafferVDB/LevelSetFilter.h"
 #include "GafferVDB/VolumeToSpheres.h"
 #include "GafferVDB/Clip.h"
+#include "GafferVDB/LevelSetToFog.h"
+
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -83,4 +85,5 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<LevelSetFilter>();
 	GafferBindings::DependencyNodeClass<VolumeToSpheres>();
 	GafferBindings::DependencyNodeClass<Clip>();
+	GafferBindings::DependencyNodeClass<LevelSetToFog>();
 }
