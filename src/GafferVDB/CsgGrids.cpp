@@ -144,6 +144,118 @@ void CSGGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Context
 	h.append( vdbLocationPlug()->hash() );
 }
 
+template<template<typename> class F>
+class Dispatcher
+{
+public:
+
+	openvdb::GridBase::Ptr operator()( openvdb::GridBase::Ptr grid ) const
+	{
+		if ( grid->valueType() == openvdb::typeNameAsString<double>() )
+		{
+			F<openvdb::DoubleGrid> f;
+			auto p = f( grid );
+			return p;
+		}
+
+		return nullptr;
+	}
+
+	openvdb::GridBase::Ptr operator()( openvdb::GridBase::ConstPtr grid ) const
+	{
+		if ( grid->valueType() == openvdb::typeNameAsString<double>() )
+		{
+			F<openvdb::DoubleGrid> f;
+			auto p = f( grid );
+			return p;
+		}
+		return nullptr;
+	}
+
+	openvdb::GridBase::Ptr operator()( openvdb::GridBase::Ptr gridA, openvdb::GridBase::Ptr gridB  ) const
+	{
+		if ( gridA->valueType() == openvdb::typeNameAsString<double>() && gridB->valueType() == openvdb::typeNameAsString<double>() )
+		{
+			F<openvdb::DoubleGrid> f;
+			auto p = f( gridA, gridB );
+			return p;
+		}
+		return nullptr;
+	}
+
+	openvdb::GridBase::Ptr operator()( openvdb::GridBase::ConstPtr gridA, openvdb::GridBase::ConstPtr gridB  ) const
+	{
+		if ( gridA->valueType() == openvdb::typeNameAsString<double>() && gridB->valueType() == openvdb::typeNameAsString<double>() )
+		{
+			F<openvdb::DoubleGrid> f;
+			auto p = f( openvdb::GridBase::constGrid<openvdb::DoubleGrid>( gridA ), openvdb::GridBase::constGrid<openvdb::DoubleGrid>( gridB ) );
+			return p;
+		}
+		else if ( gridA->valueType() == openvdb::typeNameAsString<float>() && gridB->valueType() == openvdb::typeNameAsString<float>() )
+		{
+			F<openvdb::FloatGrid> f;
+			auto p = f( openvdb::GridBase::constGrid<openvdb::FloatGrid>( gridA ), openvdb::GridBase::constGrid<openvdb::FloatGrid>( gridB ) );
+			return p;
+		}
+		return nullptr;
+	}
+};
+
+template<typename VDBGridType>
+class UnionFunctor
+{
+public:
+	typedef typename VDBGridType::Ptr Ptr;
+	typedef typename VDBGridType::ConstPtr ConstPtr;
+
+	Ptr operator() (ConstPtr gridA, ConstPtr gridB )
+	{
+		Ptr copyOfGridA = gridA->deepCopy();
+		Ptr copyOfGridB = gridB->deepCopy();
+
+		openvdb::tools::csgUnion(*copyOfGridA, *copyOfGridB);
+
+		return copyOfGridA;
+	}
+};
+
+template<typename VDBGridType>
+class IntersectionFunctor
+{
+public:
+	typedef typename VDBGridType::Ptr Ptr;
+	typedef typename VDBGridType::ConstPtr ConstPtr;
+
+	Ptr operator() (ConstPtr gridA, ConstPtr gridB )
+	{
+		Ptr copyOfGridA = gridA->deepCopy();
+		Ptr copyOfGridB = gridB->deepCopy();
+
+		openvdb::tools::csgIntersection(*copyOfGridA, *copyOfGridB);
+
+		return copyOfGridA;
+	}
+};
+
+template<typename VDBGridType>
+class DifferenceFunctor
+{
+public:
+	typedef typename VDBGridType::Ptr Ptr;
+	typedef typename VDBGridType::ConstPtr ConstPtr;
+
+	Ptr operator() (ConstPtr gridA, ConstPtr gridB )
+	{
+		Ptr copyOfGridA = gridA->deepCopy();
+		Ptr copyOfGridB = gridB->deepCopy();
+
+		openvdb::tools::csgDifference(*copyOfGridA, *copyOfGridB);
+
+		return copyOfGridA;
+	}
+};
+
+
 IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	const VDBObject *vdbObjectA = runTimeCast<const VDBObject>(inputObject.get());
@@ -170,29 +282,39 @@ IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, 
 		return inputObject;
 	}
 
+	VDBObjectPtr newVDBObject = vdbObjectA->copy();
+
+
 	openvdb::FloatGrid::Ptr copyOfGridA = srcGridA->deepCopy();
 	openvdb::FloatGrid::Ptr copyOfGridB = srcGridB->deepCopy();
 
-	VDBObjectPtr newVDBObject = vdbObjectA->copy();
 
 	switch(operationPlug()->getValue())
 	{
 		case 0:
-			openvdb::tools::csgUnion(*copyOfGridA, *copyOfGridB);
-			newVDBObject->insertGrid( copyOfGridA );
+		{
+			Dispatcher<UnionFunctor> d;
+			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
 			break;
+		}
 		case 1:
-			openvdb::tools::csgIntersection(*copyOfGridA, *copyOfGridB);
-			newVDBObject->insertGrid( copyOfGridA );
+		{
+			Dispatcher<IntersectionFunctor> d;
+			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
 			break;
+		}
 		case 2:
-			openvdb::tools::csgDifference(*copyOfGridA, *copyOfGridB);
-			newVDBObject->insertGrid( copyOfGridA );
+		{
+			Dispatcher<DifferenceFunctor> d;
+			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
 			break;
+		}
 		case 3:
-			openvdb::tools::csgDifference(*copyOfGridB, *copyOfGridA);
-			newVDBObject->insertGrid( copyOfGridB );
+		{
+			Dispatcher<DifferenceFunctor> d;
+			newVDBObject->insertGrid( d( srcGridB, srcGridA ) );
 			break;
+		}
 		default:
 			return inputObject;
 	}
