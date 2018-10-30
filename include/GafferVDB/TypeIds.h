@@ -44,7 +44,7 @@ enum TypeId
 {
 	ClipTypeId = 110950,
 	VDBObjectTypeId = 110951,
-	VDBSceneTypeId = 110952, // Obsolete - available for reuse
+	LevelSetMorphTypeId = 110952,
 	MeshToLevelSetTypeId = 110953,
 	LevelSetToMeshTypeId = 110954,
 	LevelSetOffsetTypeId = 110955,
