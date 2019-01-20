@@ -42,6 +42,7 @@
 #include "GafferOSL/OSLLight.h"
 #include "GafferOSL/OSLObject.h"
 #include "GafferOSL/OSLShader.h"
+#include "GafferOSL/OSLVDB.h"
 #include "GafferOSL/ShadingEngine.h"
 #include "GafferOSL/ShadingEngineAlgo.h"
 
@@ -245,5 +246,7 @@ BOOST_PYTHON_MODULE( _GafferOSL )
 			.value( "Geometry", OSLLight::Geometry )
 		;
 	}
+
+	GafferBindings::DependencyNodeClass<OSLVDB>();
 
 }
