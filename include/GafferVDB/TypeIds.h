@@ -63,6 +63,7 @@ enum TypeId
 	LevelSetMeasureTypeId = 110968,
 	LevelSetFilterTypeId = 110969,
 	VolumeToSpheresTypeId = 110970,
+    LevelSetToFogTypeId = 110971,
 	LastTypeId = 110974
 };
 
