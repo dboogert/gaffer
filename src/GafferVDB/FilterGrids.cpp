@@ -66,6 +66,8 @@ FilterGrids::FilterGrids( const std::string &name )
 
 	addChild( new StringPlug( "grids", Plug::In, "density" ) );
 	addChild( new IntPlug( "filterType", Plug::In, 0 ) );
+	addChild( new IntPlug( "width", Plug::In, 1));
+	addChild( new IntPlug("iterations", Plug::In, 1));
 }
 
 FilterGrids::~FilterGrids()
@@ -92,11 +94,32 @@ const Gaffer::IntPlug *FilterGrids::filterTypePlug() const
 	return  getChild<IntPlug>( g_firstPlugIndex + 1);
 }
 
+
+Gaffer::IntPlug *FilterGrids::widthPlug()
+{
+	return getChild<IntPlug>( g_firstPlugIndex + 2);
+}
+
+const Gaffer::IntPlug *FilterGrids::widthPlug() const
+{
+	return getChild<IntPlug>( g_firstPlugIndex + 2);
+}
+
+Gaffer::IntPlug *FilterGrids::iterationsPlug()
+{
+	return getChild<IntPlug>( g_firstPlugIndex + 3);
+}
+
+const Gaffer::IntPlug *FilterGrids::iterationsPlug() const
+{
+	return getChild<IntPlug>( g_firstPlugIndex + 3);
+}
+
 void FilterGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == filterTypePlug() || input == gridsPlug() )
+	if( input == filterTypePlug() || input == gridsPlug() || input == iterationsPlug() || input == filterPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -129,8 +152,8 @@ IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &pat
 	std::string gridsToProcess = gridsPlug()->getValue();
 
 	int filterType = filterTypePlug()->getValue();
-	int width = 1;
-	int iterations = 1;
+	int width = widthPlug()->getValue();
+	int iterations = iterationsPlug()->getValue();
 
 	IECoreVDB::VDBObjectPtr newVDBObject = vdbObject->copy();
 
