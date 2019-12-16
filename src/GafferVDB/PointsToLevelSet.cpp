@@ -170,11 +170,21 @@ const Gaffer::StringPlug *PointsToLevelSet::gridPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex + 2);
 }
 
+Gaffer::FloatPlug *PointsToLevelSet::radiusPlug()
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 3);
+}
+
+const Gaffer::FloatPlug *PointsToLevelSet::radiusPlug() const
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 3);
+}
+
 void PointsToLevelSet::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridPlug() || input == pointsLocationPlug() || input->parent() == otherPlug() )
+	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusPlug() || input->parent() == otherPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -195,8 +205,9 @@ void PointsToLevelSet::hashProcessedObject( const ScenePath &path, const Gaffer:
 	GafferScene::ScenePlug::ScenePath pointsLocation ;
 	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation);
 
-	h.append (otherPlug()->objectHash( pointsLocation ) );
-	h.append( otherPlug()->fullTransformHash( pointsLocation ) );
+	h.append(otherPlug()->objectHash( pointsLocation ) );
+	h.append(otherPlug()->fullTransformHash( pointsLocation ) );
+	h.append(radiusPlug()->hash() );
 }
 
 IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -233,7 +244,7 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 	IECoreScene::ConstPrimitivePtr pointsPrimitive = runTimeCast<const IECoreScene::Primitive>( otherPlug()->object( pointsLocation ) );
 
 	ParticleList particleList(pointsPrimitive);
-	toLevelSet.rasterizeSpheres( particleList, 0.1f );
+	toLevelSet.rasterizeSpheres( particleList, radiusPlug()->getValue() );
 
 	return newVDBObject;
 }

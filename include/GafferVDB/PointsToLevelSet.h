@@ -64,6 +64,9 @@ namespace GafferVDB
 		Gaffer::StringPlug *pointsLocationPlug();
 		const Gaffer::StringPlug *pointsLocationPlug() const;
 
+        Gaffer::FloatPlug *radiusPlug();
+        const Gaffer::FloatPlug *radiusPlug() const;
+
 		Gaffer::StringPlug *gridPlug();
 		const Gaffer::StringPlug *gridPlug() const;
 
