@@ -141,7 +141,8 @@ void Sample::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs
 		input == positionPlug() ||
 		input->parent() == otherPlug() ||
 		input ==  positionPlug() ||
-		input == vdbLocationPlug() )
+		input == vdbLocationPlug() ||
+		input == interpolationPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 	}
@@ -164,6 +165,7 @@ void Sample::hashProcessedObject( const ScenePath &path, const Gaffer::Context *
 	h.append( otherPlug()->fullTransformHash( p ) );
 	h.append( vdbLocationPlug()->hash() );
 	h.append( gridsPlug()->hash() );
+	h.append( interpolationPlug()->hash() );
 }
 
 IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
