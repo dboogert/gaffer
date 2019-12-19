@@ -32,4 +32,14 @@
         * Also a problem with fog volumes
 * [L][1 VDB input + 1 points input] PointsToLevelSet
     * add radius parameter
-    * NEED an empty grid of known resolution & type                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+    * NEED an empty grid of known resolution & type
+    * Add trails option                    
+
+Add mask to filtering and morphology            
+copy grids from one VDB into another
+segment SDF LevelSet
+fracture levelset
+Advect points
+LevelSetAdvection
+OSL                                   
+Ray Intersection                                                                                                                                                                                                                                                                                                                                                                                                        
