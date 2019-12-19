@@ -74,8 +74,6 @@ MathOp::~MathOp()
 {
 }
 
-
-
 Gaffer::StringPlug *MathOp::gridsPlug()
 {
     return getChild<StringPlug>( g_firstPlugIndex );
@@ -85,7 +83,6 @@ const Gaffer::StringPlug *MathOp::gridsPlug() const
 {
     return getChild<const StringPlug>( g_firstPlugIndex );
 }
-
 
 Gaffer::IntPlug *MathOp::typePlug()
 {
@@ -101,7 +98,7 @@ void MathOp::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs
 {
     SceneElementProcessor::affects( input, outputs );
 
-    if ( input == gridsPlug() || input ==  typePlug() )
+    if ( input == gridsPlug() || input == typePlug() )
     {
         outputs.push_back( outPlug()->objectPlug() );
         outputs.push_back( outPlug()->boundPlug() );
