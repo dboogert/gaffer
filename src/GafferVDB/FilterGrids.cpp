@@ -119,7 +119,7 @@ void FilterGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &ou
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == filterTypePlug() || input == gridsPlug() || input == iterationsPlug() || input == filterPlug() )
+	if( input == filterTypePlug() || input == gridsPlug() || input == iterationsPlug() || input == widthPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -137,6 +137,8 @@ void FilterGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Cont
 
 	filterTypePlug()->hash( h );
 	h.append( gridsPlug()->hash() );
+    h.append( iterationsPlug()->hash() );
+    h.append( widthPlug()->hash() );
 }
 
 IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
