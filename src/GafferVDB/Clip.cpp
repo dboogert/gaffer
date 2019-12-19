@@ -142,6 +142,7 @@ void Clip::hashProcessedObject( const ScenePath &path, const Gaffer::Context *co
 	h.append( otherPlug()->objectHash( p ) );
 	h.append( gridsPlug()->hash() );
 	h.append( vdbLocationPlug()->hash() );
+	h.append( operationPlug()->hash() );
 }
 
 IECore::ConstObjectPtr Clip::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
