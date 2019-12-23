@@ -482,6 +482,7 @@ nodeMenu.append( "/VDB/LevelSetFilter", GafferVDB.LevelSetFilter, searchText = "
 nodeMenu.append( "/VDB/VolumeToSpheres", GafferVDB.VolumeToSpheres, searchText = "VolumeToSpheres" )
 nodeMenu.append( "/VDB/Clip", GafferVDB.Clip, searchText = "Clip" )
 nodeMenu.append( "/VDB/LevelSetToFog", GafferVDB.LevelSetToFog, searchText="LevelSetToFog")
+nodeMenu.append( "/VDB/SegmentGrids", GafferVDB.SegmentGrids, searchText="SegmentGrids")
 
 # Dispatch nodes
 
