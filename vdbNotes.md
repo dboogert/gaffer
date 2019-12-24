@@ -35,9 +35,16 @@
     * NEED an empty grid of known resolution & type
     * Add trails option                    
 
+* [L] Primitives (LevelSetPlatonic.h)
+    Platonic
+* [L] Sphere (LevelSetSphere.h)
+      
+
+UI For VDBObject node (grid type drop down, tool tips for other parameters)
+Render (input camera & VDB and grid) output image
+    
 Add mask to filtering and morphology            
 copy grids from one VDB into another
-segment SDF LevelSet
 fracture levelset
 Advect points
 LevelSetAdvection
