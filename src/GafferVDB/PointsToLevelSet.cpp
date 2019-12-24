@@ -64,16 +64,30 @@ namespace
 	{
 	public:
 
-		ParticleList(IECoreScene::ConstPrimitivePtr primitive )
+		ParticleList( IECoreScene::ConstPrimitivePtr primitive )
 		: primitive( primitive )
-		//,  positions( primitive-> )
 		{
-			auto data =  primitive->variables.find("P")->second.data;
+			auto data =  primitive->variables.find( "P" )->second.data;
 
-			auto vectorData = IECore::runTimeCast<IECore::V3fVectorData>(data);
+			auto vectorData = IECore::runTimeCast<IECore::V3fVectorData>( data );
 			positions = &vectorData->readable();
-		}
 
+			auto widthIt = primitive->variables.find( "width" );
+
+			if ( widthIt != primitive->variables.end() )
+            {
+                // todo name `width` parameter
+                auto widthData = IECore::runTimeCast<IECore::FloatVectorData>( widthIt->second.data );
+                widths = &widthData->readable();
+            }
+			else
+            {
+                widths = nullptr;
+			}
+
+
+            // todo add velocity parameter
+		}
 
 		typedef openvdb::Vec3R  PosType;
 
@@ -98,7 +112,7 @@ namespace
 		{
 			auto p = (*positions)[n];
 			xyz =  openvdb::Vec3R(p[0],p[1], p[2] );
-			rad = 0.01;
+			rad = widths ? (*widths)[n] : 0.1f;
 		}
 
 
@@ -108,7 +122,7 @@ namespace
 		{
 			auto p = (*positions)[n];
 			xyz =  openvdb::Vec3R(p[0],p[1], p[2] );
-			rad = 0.01;
+			rad = widths ? (*widths)[n] : 0.1f;
 			xyz =  openvdb::Vec3R( 0.0f, 0.0f, 0.0f );
 		}
 
@@ -121,6 +135,7 @@ namespace
 
 		IECoreScene::ConstPrimitivePtr primitive;
 		const std::vector<Imath::V3f> *positions;
+		const std::vector<float> *widths;
 
 	};
 }
@@ -134,6 +149,8 @@ PointsToLevelSet::PointsToLevelSet( const std::string &name )
 
 	addChild( new StringPlug( "pointsLocation", Plug::In, "") );
 	addChild( new StringPlug( "grid", Plug::In, "") );
+
+    addChild( new FloatPlug( "radius", Plug::In, 1.0f, 0.0f) );
 }
 
 PointsToLevelSet::~PointsToLevelSet()
@@ -167,24 +184,24 @@ Gaffer::StringPlug *PointsToLevelSet::gridPlug()
 
 const Gaffer::StringPlug *PointsToLevelSet::gridPlug() const
 {
-	return  getChild<StringPlug>( g_firstPlugIndex + 2);
+	return  getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
 Gaffer::FloatPlug *PointsToLevelSet::radiusPlug()
 {
-    return getChild<FloatPlug>( g_firstPlugIndex + 3);
+    return getChild<FloatPlug>( g_firstPlugIndex + 3 );
 }
 
 const Gaffer::FloatPlug *PointsToLevelSet::radiusPlug() const
 {
-    return getChild<FloatPlug>( g_firstPlugIndex + 3);
+    return getChild<FloatPlug>( g_firstPlugIndex + 3 );
 }
 
 void PointsToLevelSet::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusPlug() || input->parent() == otherPlug() )
+	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusPlug() || input == otherPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -243,7 +260,7 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 
 	IECoreScene::ConstPrimitivePtr pointsPrimitive = runTimeCast<const IECoreScene::Primitive>( otherPlug()->object( pointsLocation ) );
 
-	ParticleList particleList(pointsPrimitive);
+	ParticleList particleList( pointsPrimitive );
 	toLevelSet.rasterizeSpheres( particleList, radiusPlug()->getValue() );
 
 	return newVDBObject;
