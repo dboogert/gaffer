@@ -59,6 +59,12 @@ namespace GafferVDB
 		Gaffer::V3iPlug *dimensionsPlug();
 		const Gaffer::V3iPlug *dimensionsPlug() const;
 
+        Gaffer::IntPlug *gridTypePlug();
+        const Gaffer::IntPlug *gridTypePlug() const;
+
+        Gaffer::StringPlug *gridNamePlug();
+        const Gaffer::StringPlug *gridNamePlug() const;
+
 		void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
