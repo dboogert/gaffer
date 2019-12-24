@@ -65,6 +65,9 @@ namespace GafferVDB
         Gaffer::StringPlug *gridNamePlug();
         const Gaffer::StringPlug *gridNamePlug() const;
 
+        Gaffer::FloatPlug *voxelSizePlug();
+        const Gaffer::FloatPlug *voxelSizePlug() const;
+
 		void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
