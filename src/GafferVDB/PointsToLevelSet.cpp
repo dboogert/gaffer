@@ -149,6 +149,11 @@ namespace
 //
 //		}
 
+        bool hasVelocity() const
+        {
+		    return velocities != nullptr;
+        }
+
 		IECoreScene::ConstPrimitivePtr primitive;
 		const std::vector<Imath::V3f> *positions;
 		const std::vector<float> *widths;
@@ -278,6 +283,7 @@ void PointsToLevelSet::hashProcessedObject( const ScenePath &path, const Gaffer:
 	h.append( otherPlug()->objectHash( pointsLocation ) );
 	h.append( otherPlug()->fullTransformHash( pointsLocation ) );
 	h.append( radiusScalePlug()->hash() );
+	h.append( trailsPlug()->hash() );
 	h.append( velocityScalePlug()->hash() );
 	h.append( trailDeltaPlug()->hash() );
 }
@@ -316,8 +322,15 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 	IECoreScene::ConstPrimitivePtr pointsPrimitive = runTimeCast<const IECoreScene::Primitive>( otherPlug()->object( pointsLocation ) );
 
 	ParticleList particleList( pointsPrimitive, radiusScalePlug()->getValue(), velocityScalePlug()->getValue() );
-	if (trailsPlug()->getValue())
+
+	const bool rasteriseTrails = trailsPlug()->getValue() ;
+
+	if ( rasteriseTrails )
     {
+	    if ( !particleList.hasVelocity() )
+        {
+            throw IECore::Exception( "particles require `velocity` V3f attribute to render trails" );
+        }
         toLevelSet.rasterizeTrails( particleList, trailDeltaPlug()->getValue() );
     }
 	else
