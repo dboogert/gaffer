@@ -42,6 +42,14 @@
 
 UI For VDBObject node (grid type drop down, tool tips for other parameters)
 Render (input camera & VDB and grid) output image
+Interupt long running operations
+VDB Scene Writer
+How can i make sure there is always something visualised
+
+points to level set 
+    - disable trail options (vel & delta)
+    - warn if no vel attribute
+    - tool tips for delta
     
 Add mask to filtering and morphology            
 copy grids from one VDB into another
