@@ -87,8 +87,18 @@ namespace
                 widths = nullptr;
 			}
 
+            auto velocityIt = primitive->variables.find( "velocity" );
 
-            // todo add velocity parameter
+            if ( velocityIt != primitive->variables.end() )
+            {
+                // todo name `velocity` parameter
+                auto velocityData = IECore::runTimeCast<IECore::V3fVectorData>( velocityIt->second.data );
+                velocities = &velocityData->readable();
+            }
+            else
+            {
+                velocities = nullptr;
+            }
 		}
 
 		typedef openvdb::Vec3R  PosType;
@@ -124,11 +134,12 @@ namespace
 		void getPosRadVel(size_t n, openvdb::Vec3R& xyz, openvdb::Real& rad, openvdb::Vec3R& vel) const
 		{
 			auto p = (*positions)[n];
+			auto v = velocities ? (*velocities)[n] : Imath::V3f(0,0,0);
 			xyz =  openvdb::Vec3R(p[0],p[1], p[2] );
 			rad = widths ? (*widths)[n] : 1.0f;
 			rad *= radiusScale;
-			xyz =  openvdb::Vec3R( 0.0f, 0.0f, 0.0f );
-            xyz *= velocityScale;
+            vel =  openvdb::Vec3R( v[0], v[1], v[2] );
+            vel *= velocityScale;
 		}
 
 		// Get the attribute of the nth particle. AttributeType is user-defined!
@@ -141,7 +152,7 @@ namespace
 		IECoreScene::ConstPrimitivePtr primitive;
 		const std::vector<Imath::V3f> *positions;
 		const std::vector<float> *widths;
-
+        const std::vector<Imath::V3f> * velocities;
 		float radiusScale;
 		float velocityScale;
 	};
