@@ -64,8 +64,17 @@ namespace GafferVDB
 		Gaffer::StringPlug *pointsLocationPlug();
 		const Gaffer::StringPlug *pointsLocationPlug() const;
 
-        Gaffer::FloatPlug *radiusPlug();
-        const Gaffer::FloatPlug *radiusPlug() const;
+        Gaffer::FloatPlug *radiusScalePlug();
+        const Gaffer::FloatPlug *radiusScalePlug() const;
+
+        Gaffer::FloatPlug *velocityScalePlug();
+        const Gaffer::FloatPlug *velocityScalePlug() const;
+
+        Gaffer::BoolPlug *trailsPlug();
+        const Gaffer::BoolPlug *trailsPlug() const;
+
+        Gaffer::FloatPlug *trailDeltaPlug();
+        const Gaffer::FloatPlug *trailDeltaPlug() const;
 
 		Gaffer::StringPlug *gridPlug();
 		const Gaffer::StringPlug *gridPlug() const;

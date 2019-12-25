@@ -64,8 +64,10 @@ namespace
 	{
 	public:
 
-		ParticleList( IECoreScene::ConstPrimitivePtr primitive )
-		: primitive( primitive )
+		ParticleList( IECoreScene::ConstPrimitivePtr primitive, float radiusScale, float velocityScale )
+		: primitive( primitive ),
+          radiusScale(radiusScale),
+		  velocityScale(velocityScale)
 		{
 			auto data =  primitive->variables.find( "P" )->second.data;
 
@@ -112,7 +114,8 @@ namespace
 		{
 			auto p = (*positions)[n];
 			xyz =  openvdb::Vec3R(p[0],p[1], p[2] );
-			rad = widths ? (*widths)[n] : 0.1f;
+			rad = widths ? (*widths)[n] : 1.0f;
+			rad *= radiusScale;
 		}
 
 
@@ -122,8 +125,10 @@ namespace
 		{
 			auto p = (*positions)[n];
 			xyz =  openvdb::Vec3R(p[0],p[1], p[2] );
-			rad = widths ? (*widths)[n] : 0.1f;
+			rad = widths ? (*widths)[n] : 1.0f;
+			rad *= radiusScale;
 			xyz =  openvdb::Vec3R( 0.0f, 0.0f, 0.0f );
+            xyz *= velocityScale;
 		}
 
 		// Get the attribute of the nth particle. AttributeType is user-defined!
@@ -137,6 +142,8 @@ namespace
 		const std::vector<Imath::V3f> *positions;
 		const std::vector<float> *widths;
 
+		float radiusScale;
+		float velocityScale;
 	};
 }
 
@@ -150,7 +157,10 @@ PointsToLevelSet::PointsToLevelSet( const std::string &name )
 	addChild( new StringPlug( "pointsLocation", Plug::In, "") );
 	addChild( new StringPlug( "grid", Plug::In, "") );
 
-    addChild( new FloatPlug( "radius", Plug::In, 1.0f, 0.0f) );
+    addChild( new FloatPlug( "radiusScale", Plug::In, 1.0f, 0.0f) );
+    addChild( new BoolPlug( "trails", Plug::In, false) );
+    addChild( new FloatPlug( "trailDelta", Plug::In, 0.5f) );
+    addChild( new FloatPlug( "velocityScale", Plug::In, 1.0f, 0.0f) );
 }
 
 PointsToLevelSet::~PointsToLevelSet()
@@ -187,21 +197,53 @@ const Gaffer::StringPlug *PointsToLevelSet::gridPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
-Gaffer::FloatPlug *PointsToLevelSet::radiusPlug()
+Gaffer::FloatPlug *PointsToLevelSet::radiusScalePlug()
 {
     return getChild<FloatPlug>( g_firstPlugIndex + 3 );
 }
 
-const Gaffer::FloatPlug *PointsToLevelSet::radiusPlug() const
+const Gaffer::FloatPlug *PointsToLevelSet::radiusScalePlug() const
 {
     return getChild<FloatPlug>( g_firstPlugIndex + 3 );
 }
+
+Gaffer::BoolPlug *PointsToLevelSet::trailsPlug()
+{
+    return getChild<BoolPlug>( g_firstPlugIndex + 4 );
+}
+
+const Gaffer::BoolPlug *PointsToLevelSet::trailsPlug() const
+{
+    return getChild<BoolPlug>( g_firstPlugIndex + 4 );
+}
+
+Gaffer::FloatPlug *PointsToLevelSet::trailDeltaPlug()
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 5 );
+}
+
+const Gaffer::FloatPlug *PointsToLevelSet::trailDeltaPlug() const
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 5 );
+}
+
+Gaffer::FloatPlug *PointsToLevelSet::velocityScalePlug()
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 6 );
+}
+
+const Gaffer::FloatPlug *PointsToLevelSet::velocityScalePlug() const
+{
+    return getChild<FloatPlug>( g_firstPlugIndex + 6 );
+}
+
 
 void PointsToLevelSet::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusPlug() || input == otherPlug() )
+	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusScalePlug() || input == velocityScalePlug()
+	|| input == trailsPlug() || input == trailDeltaPlug() || input == otherPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -222,9 +264,11 @@ void PointsToLevelSet::hashProcessedObject( const ScenePath &path, const Gaffer:
 	GafferScene::ScenePlug::ScenePath pointsLocation ;
 	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation);
 
-	h.append(otherPlug()->objectHash( pointsLocation ) );
-	h.append(otherPlug()->fullTransformHash( pointsLocation ) );
-	h.append(radiusPlug()->hash() );
+	h.append( otherPlug()->objectHash( pointsLocation ) );
+	h.append( otherPlug()->fullTransformHash( pointsLocation ) );
+	h.append( radiusScalePlug()->hash() );
+	h.append( velocityScalePlug()->hash() );
+	h.append( trailDeltaPlug()->hash() );
 }
 
 IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -256,13 +300,19 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 	openvdb::tools::ParticlesToLevelSet<openvdb::FloatGrid> toLevelSet ( *floatGrid );
 
 	GafferScene::ScenePlug::ScenePath pointsLocation ;
-	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation);
+	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation );
 
 	IECoreScene::ConstPrimitivePtr pointsPrimitive = runTimeCast<const IECoreScene::Primitive>( otherPlug()->object( pointsLocation ) );
 
-	ParticleList particleList( pointsPrimitive );
-	toLevelSet.rasterizeSpheres( particleList, radiusPlug()->getValue() );
-
+	ParticleList particleList( pointsPrimitive, radiusScalePlug()->getValue(), velocityScalePlug()->getValue() );
+	if (trailsPlug()->getValue())
+    {
+        toLevelSet.rasterizeTrails( particleList, trailDeltaPlug()->getValue() );
+    }
+	else
+    {
+        toLevelSet.rasterizeSpheres( particleList );
+    }
 	return newVDBObject;
 }
 
