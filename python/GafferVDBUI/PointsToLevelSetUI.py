@@ -40,5 +40,44 @@ import GafferVDB
 GafferUI.Metadata.registerNode(
     GafferVDB.PointsToLevelSet,
     'description',
-    """Rasterise points into a level set grid"""
+    """Rasterise points into a level set grid""",
+    plugs={
+        'pointsLocation' : [
+            'description',
+            """
+            Scene graph path to points primitive in 2nd scene input
+            """
+        ],
+        'grid' : [
+            'description',
+            """
+            name of the grid in the 1st input's VDB object 
+            """
+        ],
+        'radiusScale' : [
+            'description',
+            """
+            Multiplier for the `width` attribute in the points primitive
+            """
+        ],
+        'trails' : [
+            'description',
+            """
+            The velocity is used to create a trail using multiple spheres unioned along the velocity vector, scaled by trailDelta
+            """
+        ],
+        'trailDelta' : [
+            'description',
+            """
+            Scale for each sphere to stamp out along the velocity
+            """
+        ],
+        'velocityScale' : [
+            'description',
+            """
+            Multiplier for the `velocity` attribute in the points primitive
+            """
+        ],
+
+    }
 )
