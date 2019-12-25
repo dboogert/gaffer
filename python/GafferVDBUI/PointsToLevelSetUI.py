@@ -41,6 +41,8 @@ GafferUI.Metadata.registerNode(
     GafferVDB.PointsToLevelSet,
     'description',
     """Rasterise points into a level set grid""",
+
+    "layout:activator:isTrails", lambda node : node["trails"].getValue(),
     plugs={
         'pointsLocation' : [
             'description',
@@ -57,7 +59,8 @@ GafferUI.Metadata.registerNode(
         'radiusScale' : [
             'description',
             """
-            Multiplier for the `width` attribute in the points primitive
+            Multiplier for the **width** attribute in the points primitive. If the points primitive doesn't have a **width**
+            attribute then this value is used as the radius of the points.
             """
         ],
         'trails' : [
@@ -69,14 +72,16 @@ GafferUI.Metadata.registerNode(
         'trailDelta' : [
             'description',
             """
-            Scale for each sphere to stamp out along the velocity
-            """
+            Scale for each sphere to stamp out along the velocity vector.
+            """,
+            "layout:activator", "isTrails",
         ],
         'velocityScale' : [
             'description',
             """
-            Multiplier for the `velocity` attribute in the points primitive
-            """
+            Multiplier for the **velocity** attribute in the points primitive.
+            """,
+            "layout:activator", "isTrails",
         ],
 
     }
