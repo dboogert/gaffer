@@ -108,8 +108,6 @@ void SegmentGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Con
 
 IECore::ConstObjectPtr SegmentGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
-    std::cout << "segment grids" << std::endl;
-
 	auto vdbObject = IECore::runTimeCast<const IECoreVDB::VDBObject> ( inPlug()->object( path ) );
 
 	if ( !vdbObject )
@@ -128,7 +126,6 @@ IECore::ConstObjectPtr SegmentGrids::computeProcessedObject( const ScenePath &pa
 		{
             continue;
         }
-		std::cout << "grid name : " << gridName << std::endl;
 
         openvdb::GridBase::ConstPtr srcGrid = vdbObject->findGrid( gridName );
 
@@ -138,8 +135,6 @@ IECore::ConstObjectPtr SegmentGrids::computeProcessedObject( const ScenePath &pa
         {
             continue;
         }
-
-        std::cout << "is float grid" << std::endl;
 
         std::vector<openvdb::FloatGrid::Ptr> segments;
         openvdb::tools::segmentSDF( *grid, segments );
