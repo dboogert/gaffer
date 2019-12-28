@@ -41,6 +41,9 @@ GafferUI.Metadata.registerNode(
     GafferVDB.ScatterPoints,
     'description',
     """Scatter points into active voxels of VDB grid""",
+
+    "layout:activator:nonuniform", lambda node : node["nonuniform"].getValue(),
+    "layout:activator:uniform", lambda node : not node["nonuniform"].getValue(),
     plugs={
 
         'outputType' : [
@@ -70,12 +73,14 @@ GafferUI.Metadata.registerNode(
             """
             If 'uniform' the total number of points to generate.
             """,
+            "layout:activator", "uniform",
         ],
         'probability' : [
             'description',
             """
             If 'nonuniform' the global probability which is used with the voxel value to weight the number of points.
             """,
+            "layout:activator", "nonuniform",
         ],
 
     }
