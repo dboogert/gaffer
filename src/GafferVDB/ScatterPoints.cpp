@@ -35,6 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/ScatterPoints.h"
+#include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -191,23 +192,29 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
         // todo raise exception
     }
 
+    Interrupter interrupter(context->canceller());
+
     PointsWriter pointWriter;
     std::default_random_engine generator;
 
     // todo case to other grid types ( dispatch grid type template function? )
     openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
+    const float spread = 1.0f;
 
     if ( nonuniformPlug()->getValue() )
     {
-        openvdb::tools::NonUniformPointScatter<PointsWriter, std::default_random_engine> nonuniformPointScatter(pointWriter, probabilityPlug()->getValue(), generator);
+        openvdb::tools::NonUniformPointScatter<PointsWriter, std::default_random_engine, Interrupter> nonuniformPointScatter(pointWriter, probabilityPlug()->getValue(), generator, spread, &interrupter);
         nonuniformPointScatter ( *floatGrid );
     }
     else
     {
-        openvdb::tools::UniformPointScatter<PointsWriter, std::default_random_engine> uniformPointScatter(pointWriter, (openvdb::Index64) pointCountPlug()->getValue(), generator);
-
-
+        openvdb::tools::UniformPointScatter<PointsWriter, std::default_random_engine, Interrupter> uniformPointScatter(pointWriter, (openvdb::Index64) pointCountPlug()->getValue(), generator, spread, &interrupter);
         uniformPointScatter( *floatGrid );
+    }
+
+    if ( interrupter.wasInterrupted() )
+    {
+        throw IECore::Cancelled();
     }
 
 
