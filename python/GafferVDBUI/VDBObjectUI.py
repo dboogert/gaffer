@@ -48,7 +48,7 @@ GafferUI.Metadata.registerNode(
             Grid type to create (fog or level set)
             """,
             "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
-            "preset:Fog Volumee", 0,
+            "preset:Fog Volume", 0,
             "preset:Level Set", 1,
         ],
         'gridName' : [
