@@ -40,21 +40,54 @@
 * [L] Sphere (LevelSetSphere.h)
       
 
+drop down for compatible grid names
+
 UI For VDBObject node (grid type drop down, tool tips for other parameters)
 Render (input camera & VDB and grid) output image
 Interupt long running operations
-VDB Scene Writer
+
 How can i make sure there is always something visualised
 
 points to level set 
-    - disable trail options (vel & delta)
-    - warn if no vel attribute
-    - tool tips for delta
+    - attribute transfer from particles to surface
+    - Canceller
+    - S-L # Points -> S-L
+    - define attribute names (width, velocity)
+    - double SDF!
+
+SegmentGrids (rename to SegmentLevelSet?)
+    - double SDF
     
+VolumeToSpheres
+    - works on Scalar field and LS
+    - double type
+    - UI tooltips
+    - interupt processing
+    
+CSGGrids (rename to CSGLevelSets)
+    - grid selector UI
+    - separate grid name for 2nd input ?
+    - tool tips
+    
+ScatterPointsInVolume 
+    - float / double scalar grid
+    - grid selector
+    - canceller
+    
+LevelSetMeasure (rename to MeasureLevelSet)
+    - canceller
+    - double grid
+    - add curvature option (without it the calculation is faster  )
+    
+    
+Trace rays against a level set / Volume
 Add mask to filtering and morphology            
 copy grids from one VDB into another
 fracture levelset
 Advect points
 LevelSetAdvection
 OSL                                   
-Ray Intersection                                                                                                                                                                                                                                                                                                                                                                                                        
+Ray Intersection
+    * https://www.openvdb.org/documentation/doxygen/RayIntersector_8h.html                                                                                                                                                                                                                                                                                                                                                                                      
+Morph
+    * https://www.openvdb.org/documentation/doxygen/LevelSetMorph_8h.html
