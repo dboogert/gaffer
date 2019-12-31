@@ -192,7 +192,7 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
         // todo raise exception
     }
 
-    Interrupter interrupter(context->canceller());
+    Interrupter interrupter( context->canceller() );
 
     PointsWriter pointWriter;
     std::default_random_engine generator;
@@ -216,7 +216,6 @@ IECore::ConstObjectPtr ScatterPoints::computeProcessedObject( const ScenePath &p
     {
         throw IECore::Cancelled();
     }
-
 
     IECoreScene::PointsPrimitivePtr pointsPrimitive = new IECoreScene::PointsPrimitive( pointWriter.pointsData );
     return pointsPrimitive;
