@@ -35,6 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/VolumeToSpheres.h"
+#include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -178,40 +179,53 @@ IECore::ConstObjectPtr VolumeToSpheres::computeProcessedObject( const ScenePath 
 
 	IECoreVDB::VDBObjectPtr newVDBObject = vdbObject->copy();
 
+    Interrupter interrupter( context->canceller() );
+
+    const int instanceCount = 10000;
+
 	for (const auto &gridName : grids )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
+		if ( !IECore::StringAlgo::matchMultiple(gridName, gridsToProcess ) )
 		{
-			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
-			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
+            continue;
+        }
 
-			if ( floatGrid )
-			{
+        openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
 
-				std::vector<openvdb::Vec4f> spheres;
-				openvdb::tools::fillWithSpheres<openvdb::FloatGrid>( *floatGrid, spheres, maxSpheresPlug()->getValue(), overlappingPlug()->getValue(), minRadiusPlug()->getValue(), maxRadiusPlug()->getValue(), isoValuePlug()->getValue() );
+        if ( !floatGrid )
+        {
+            continue;
+        }
 
-				IECore::V3fVectorDataPtr positions = new IECore::V3fVectorData();
-				IECore::FloatVectorDataPtr radii = new IECore::FloatVectorData();
+        std::vector<openvdb::Vec4f> spheres;
+        openvdb::tools::fillWithSpheres<openvdb::FloatGrid, Interrupter>( *floatGrid,
+                spheres,
+                openvdb::Vec2i( 0, maxSpheresPlug()->getValue() ),
+                overlappingPlug()->getValue(),
+                minRadiusPlug()->getValue(),
+                maxRadiusPlug()->getValue(),
+                isoValuePlug()->getValue(),
+                instanceCount,
+                &interrupter);
 
-				auto &wposArray = positions->writable();
-				auto &sizeArray = radii->writable();
+        IECore::V3fVectorDataPtr positions = new IECore::V3fVectorData();
+        IECore::FloatVectorDataPtr radii = new IECore::FloatVectorData();
 
-				for (const auto s : spheres)
-				{
-					wposArray.push_back(Imath::V3f(s[0], s[1], s[2]));
-					sizeArray.push_back(s[3] * 2.0f);
-				}
+        auto &wposArray = positions->writable();
+        auto &sizeArray = radii->writable();
 
+        for (const auto s : spheres)
+        {
+            wposArray.push_back(Imath::V3f(s[0], s[1], s[2]));
+            sizeArray.push_back(s[3] * 2.0f);
+        }
 
-				IECoreScene::PointsPrimitivePtr pointsPrimitive = new IECoreScene::PointsPrimitive( positions );
-				pointsPrimitive->variables["width"] = IECoreScene::PrimitiveVariable(IECoreScene::PrimitiveVariable::Interpolation::Vertex,
-						radii);
+        IECoreScene::PointsPrimitivePtr pointsPrimitive = new IECoreScene::PointsPrimitive( positions );
+        pointsPrimitive->variables["width"] = IECoreScene::PrimitiveVariable(IECoreScene::PrimitiveVariable::Interpolation::Vertex,
+                radii);
 
-				return pointsPrimitive;
-
-			}
-		}
+        return pointsPrimitive;
 	}
 
 	return newVDBObject;
