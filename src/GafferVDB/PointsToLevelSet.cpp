@@ -35,14 +35,16 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/PointsToLevelSet.h"
+#include "GafferVDB/Interrupt.h"
 
-#include "IECore/StringAlgo.h"
-#include "IECore/VectorTypedData.h"
-#include "IECoreScene/Primitive.h"
+#include "Gaffer/StringPlug.h"
 
 #include "IECoreVDB/VDBObject.h"
 
-#include "Gaffer/StringPlug.h"
+#include "IECore/StringAlgo.h"
+#include "IECore/VectorTypedData.h"
+
+#include "IECoreScene/Primitive.h"
 
 #include "openvdb/tools/ParticlesToLevelSet.h"
 
@@ -314,7 +316,9 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 		return inputObject;
 	}
 
-	openvdb::tools::ParticlesToLevelSet<openvdb::FloatGrid> toLevelSet ( *floatGrid );
+    Interrupter interrupter( context->canceller() );
+
+	openvdb::tools::ParticlesToLevelSet<openvdb::FloatGrid, void, Interrupter> toLevelSet ( *floatGrid, &interrupter );
 
 	GafferScene::ScenePlug::ScenePath pointsLocation ;
 	GafferScene::ScenePlug::stringToPath( pointsLocationPlug()->getValue(), pointsLocation );
@@ -337,6 +341,11 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
     {
         toLevelSet.rasterizeSpheres( particleList );
     }
+
+    if ( interrupter.wasInterrupted() )
+    {
+        throw IECore::Cancelled();
+    }
 	return newVDBObject;
 }
 
@@ -349,7 +358,7 @@ void PointsToLevelSet::hashProcessedBound( const ScenePath &path, const Gaffer::
 {
 	SceneElementProcessor::hashProcessedBound( path, context, h );
 
-	hashProcessedObject( path, context, h);
+	hashProcessedObject( path, context, h );
 }
 
 Imath::Box3f PointsToLevelSet::computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const
