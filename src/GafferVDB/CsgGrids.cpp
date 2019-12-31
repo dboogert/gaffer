@@ -35,6 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/CsgGrids.h"
+#include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -58,6 +59,8 @@ using namespace GafferScene;
 IE_CORE_DEFINERUNTIMETYPED( CSGGrids );
 
 size_t CSGGrids::g_firstPlugIndex = 0;
+
+// todo rename to CSGLevelSets
 
 CSGGrids::CSGGrids( const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
@@ -288,6 +291,7 @@ IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, 
 	openvdb::FloatGrid::Ptr copyOfGridA = srcGridA->deepCopy();
 	openvdb::FloatGrid::Ptr copyOfGridB = srcGridB->deepCopy();
 
+    Interrupter interrupter( context->canceller() );
 
 	switch(operationPlug()->getValue())
 	{
