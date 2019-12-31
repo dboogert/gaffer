@@ -68,7 +68,7 @@ Clip::Clip( const std::string &name )
 
 	addChild( new StringPlug( "vdbLocation", Plug::In, "/vdb" ) );
 	addChild( new StringPlug( "grids", Plug::In, "density" ) );
-	addChild( new IntPlug( "operation", Plug::In, 0) );
+	addChild( new IntPlug( "operation", Plug::In, 0 ) );
 
 }
 
@@ -106,21 +106,14 @@ const Gaffer::StringPlug *Clip::gridsPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
-Gaffer::IntPlug *Clip::operationPlug()
-{
-	return  getChild<IntPlug>( g_firstPlugIndex + 3 );
-}
-
-const Gaffer::IntPlug *Clip::operationPlug() const
-{
-	return  getChild<IntPlug>( g_firstPlugIndex + 3 );
-}
 
 void Clip::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == operationPlug() || input->parent() == otherPlug() || input == gridsPlug() || input == vdbLocationPlug() )
+	if( input->parent() == otherPlug() ||
+	    input == gridsPlug() ||
+	    input == vdbLocationPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -137,12 +130,12 @@ void Clip::hashProcessedObject( const ScenePath &path, const Gaffer::Context *co
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
 	ScenePlug::ScenePath p ;
-	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p);
-	operationPlug()->hash( h );
+	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p );
 	h.append( otherPlug()->objectHash( p ) );
+	h.append( otherPlug()->fullTransformHash( p ) );
 	h.append( gridsPlug()->hash() );
 	h.append( vdbLocationPlug()->hash() );
-	h.append( operationPlug()->hash() );
+
 }
 
 IECore::ConstObjectPtr Clip::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -157,7 +150,7 @@ IECore::ConstObjectPtr Clip::computeProcessedObject( const ScenePath &path, cons
 	std::string gridsToProcess = gridsPlug()->getValue();
 
 	ScenePlug::ScenePath p ;
-	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p);
+	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p );
 
 	Imath::Box3f bound = otherPlug()->bound( p );
 	Imath::M44f transform = otherPlug()->fullTransform( p );
@@ -168,21 +161,25 @@ IECore::ConstObjectPtr Clip::computeProcessedObject( const ScenePath &path, cons
 
 	IECoreVDB::VDBObjectPtr newVDBObject = vdbObject->copy();
 
-	for (const auto &gridName : grids )
+	for ( const auto &gridName : grids )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
+		if ( !IECore::StringAlgo::matchMultiple( gridName, gridsToProcess ) )
 		{
-			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid(gridName);
-			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>(grid);
+		    continue;
+        }
 
-			if (floatGrid)
-			{
-				openvdb::BBoxd bbox (openvdb::Vec3d(bound.min[0],bound.min[1],bound.min[2]), openvdb::Vec3d(bound.max[0], bound.max[1], bound.max[2]));
+        openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
 
-				openvdb::FloatGrid::Ptr clippedGrid = openvdb::tools::clip(*floatGrid, bbox);
-				newVDBObject->insertGrid( clippedGrid );
-			}
-		}
+        if ( floatGrid )
+        {
+            openvdb::BBoxd bbox (openvdb::Vec3d(bound.min[0],bound.min[1],bound.min[2] ), openvdb::Vec3d(bound.max[0], bound.max[1], bound.max[2] ) );
+
+            openvdb::FloatGrid::Ptr clippedGrid = openvdb::tools::clip( *floatGrid, bbox );
+            clippedGrid->setName( floatGrid->getName() );
+            newVDBObject->insertGrid( clippedGrid );
+        }
+
 	}
 	return newVDBObject;
 }

@@ -67,8 +67,6 @@ namespace GafferVDB
 		Gaffer::StringPlug *vdbLocationPlug();
 		const Gaffer::StringPlug *vdbLocationPlug() const;
 
-		Gaffer::IntPlug *operationPlug();
-		const Gaffer::IntPlug *operationPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
