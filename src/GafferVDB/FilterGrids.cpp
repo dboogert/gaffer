@@ -35,6 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/FilterGrids.h"
+#include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -66,8 +67,8 @@ FilterGrids::FilterGrids( const std::string &name )
 
 	addChild( new StringPlug( "grids", Plug::In, "density" ) );
 	addChild( new IntPlug( "filterType", Plug::In, 0 ) );
-	addChild( new IntPlug( "width", Plug::In, 1));
-	addChild( new IntPlug("iterations", Plug::In, 1));
+	addChild( new IntPlug( "width", Plug::In, 1 ) );
+	addChild( new IntPlug( "iterations", Plug::In, 1 ) );
 }
 
 FilterGrids::~FilterGrids()
@@ -159,6 +160,8 @@ IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &pat
 
 	IECoreVDB::VDBObjectPtr newVDBObject = vdbObject->copy();
 
+    Interrupter interrupter( context->canceller() );
+
 	for (const auto &gridName : grids )
 	{
 		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
@@ -184,6 +187,11 @@ IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &pat
 						filter.median( width, iterations );
 						break;
 				}
+
+                if ( interrupter.wasInterrupted() )
+                {
+                    throw IECore::Cancelled();
+                }
 
 				newVDBObject->insertGrid( filteredGrid );
 			}
