@@ -192,7 +192,6 @@ IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, co
 		return inputObject;
 	}
 
-
 	// todo transform to vdb objects space.
 	auto positionView = *optionalPositionView;
 
@@ -219,14 +218,16 @@ IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, co
 				// todo template function for dispatching to various GridTypes
 				IECore::FloatVectorDataPtr newPrimvarData = new IECore::FloatVectorData();
 
-				for (size_t i =0; i < positionView.size(); ++i)
+
+				// sample the grid with multiple threads
+				for ( size_t i = 0; i < positionView.size(); ++i )
 				{
 					// todo convert template for openvdb <-> imath types
 					openvdb::FloatGrid::ValueType worldValue = sampler.wsSample(openvdb::Vec3R(positionView[i][0], positionView[i][1], positionView[i][2]));
 					newPrimvarData->writable().push_back(worldValue);
 				}
 
-				// todo think about overriting existing primvar data
+				// todo think about overwriting existing primvar data
 				newPrimitive->variables[gridName] = IECoreScene::PrimitiveVariable(interpolation, newPrimvarData);
 			}
 		}
