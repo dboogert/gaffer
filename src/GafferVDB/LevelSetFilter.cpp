@@ -59,6 +59,7 @@ IE_CORE_DEFINERUNTIMETYPED( LevelSetFilter );
 
 size_t LevelSetFilter::g_firstPlugIndex = 0;
 
+// todo rename to FilterLevelSet
 LevelSetFilter::LevelSetFilter( const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
@@ -71,7 +72,6 @@ LevelSetFilter::LevelSetFilter( const std::string &name )
 LevelSetFilter::~LevelSetFilter()
 {
 }
-
 
 Gaffer::StringPlug *LevelSetFilter::gridsPlug()
 {
@@ -136,7 +136,7 @@ IECore::ConstObjectPtr LevelSetFilter::computeProcessedObject( const ScenePath &
 
 	for (const auto &gridName : grids )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
+		if (IECore::StringAlgo::matchMultiple( gridName, gridsToProcess ) )
 		{
 			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
 			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
@@ -150,18 +150,26 @@ IECore::ConstObjectPtr LevelSetFilter::computeProcessedObject( const ScenePath &
 				switch( filterType )
 				{
 					case 0:
+					    // todo width parameter
+					    // todo mask
 						filter.mean( width );
 						break;
 					case 1:
+                        // todo width parameter
+                        // todo mask
 						filter.gaussian( width );
 						break;
 					case 2:
+                        // todo width parameter
+                        // todo mask
 						filter.median( width );
 						break;
 					case 3:
+                        // todo mask
 						filter.laplacian();
 						break;
 					case 4:
+                        // todo mask
 						filter.meanCurvature();
 						break;
 				}
