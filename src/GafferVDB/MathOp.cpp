@@ -133,66 +133,68 @@ IECore::ConstObjectPtr MathOp::computeProcessedObject( const ScenePath &path, co
 
     for (const auto &gridName : gridNames )
     {
-        if ( IECore::StringAlgo::matchMultiple( gridName, grids ) )
+        if ( !IECore::StringAlgo::matchMultiple( gridName, grids ) )
         {
-            openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
+            continue;
+        }
 
-            // todo support multiple grid types
-            const int type = typePlug()->getValue();
-            if ( type == 0 )
-            {
-                openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
-                typename openvdb::tools::ScalarToVectorConverter<openvdb::FloatGrid>::Type::Ptr gradientGrid = openvdb::tools::gradient( *floatGrid );
-                gradientGrid->setName( floatGrid->getName() );
-                newVDBObject->insertGrid( gradientGrid );
-            }
-            else if ( type == 1 )
-            {
-                openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
-                openvdb::FloatGrid::Ptr laplacianGrid = openvdb::tools::laplacian( *floatGrid );
-                laplacianGrid->setName( floatGrid->getName() );
-                newVDBObject->insertGrid( laplacianGrid );
-            }
-            else if ( type == 2 )
-            {
-                openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
+        openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
 
-                openvdb::FloatGrid::Ptr divGrid = openvdb::tools::divergence( *v3grid );
-                divGrid->setName( v3grid->getName() );
-                newVDBObject->insertGrid( divGrid );
-            }
-            else if ( type == 3 )
-            {
-                openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
+        // todo support multiple grid types
+        const int type = typePlug()->getValue();
+        if ( type == 0 )
+        {
+            openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+            typename openvdb::tools::ScalarToVectorConverter<openvdb::FloatGrid>::Type::Ptr gradientGrid = openvdb::tools::gradient( *floatGrid );
+            gradientGrid->setName( floatGrid->getName() );
+            newVDBObject->insertGrid( gradientGrid );
+        }
+        else if ( type == 1 )
+        {
+            openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+            openvdb::FloatGrid::Ptr laplacianGrid = openvdb::tools::laplacian( *floatGrid );
+            laplacianGrid->setName( floatGrid->getName() );
+            newVDBObject->insertGrid( laplacianGrid );
+        }
+        else if ( type == 2 )
+        {
+            openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
 
-                openvdb::Vec3fGrid::Ptr curlGrid = openvdb::tools::curl( *v3grid );
-                curlGrid->setName( v3grid->getName() );
-                newVDBObject->insertGrid( curlGrid );
-            }
-            else if ( type == 4 )
-            {
-                openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
+            openvdb::FloatGrid::Ptr divGrid = openvdb::tools::divergence( *v3grid );
+            divGrid->setName( v3grid->getName() );
+            newVDBObject->insertGrid( divGrid );
+        }
+        else if ( type == 3 )
+        {
+            openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
 
-                openvdb::FloatGrid::Ptr magnitudeGrid = openvdb::tools::magnitude( *v3grid );
-                magnitudeGrid->setName( v3grid->getName() );
-                newVDBObject->insertGrid( magnitudeGrid );
-            }
-            else if ( type == 5 )
-            {
-                openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
+            openvdb::Vec3fGrid::Ptr curlGrid = openvdb::tools::curl( *v3grid );
+            curlGrid->setName( v3grid->getName() );
+            newVDBObject->insertGrid( curlGrid );
+        }
+        else if ( type == 4 )
+        {
+            openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
 
-                openvdb::Vec3fGrid::Ptr normalizedGrid = openvdb::tools::normalize( *v3grid );
-                normalizedGrid->setName( v3grid->getName() );
-                newVDBObject->insertGrid( normalizedGrid );
-            }
-            else if ( type == 6 )
-            {
-                openvdb::FloatGrid::ConstPtr srcGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+            openvdb::FloatGrid::Ptr magnitudeGrid = openvdb::tools::magnitude( *v3grid );
+            magnitudeGrid->setName( v3grid->getName() );
+            newVDBObject->insertGrid( magnitudeGrid );
+        }
+        else if ( type == 5 )
+        {
+            openvdb::Vec3fGrid::ConstPtr v3grid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( srcGrid );
 
-                openvdb::FloatGrid::Ptr meanCurvature = openvdb::tools::meanCurvature( *srcGrid );
-                meanCurvature->setName( srcGrid->getName() );
-                newVDBObject->insertGrid( meanCurvature );
-            }
+            openvdb::Vec3fGrid::Ptr normalizedGrid = openvdb::tools::normalize( *v3grid );
+            normalizedGrid->setName( v3grid->getName() );
+            newVDBObject->insertGrid( normalizedGrid );
+        }
+        else if ( type == 6 )
+        {
+            openvdb::FloatGrid::ConstPtr srcGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+
+            openvdb::FloatGrid::Ptr meanCurvature = openvdb::tools::meanCurvature( *srcGrid );
+            meanCurvature->setName( srcGrid->getName() );
+            newVDBObject->insertGrid( meanCurvature );
         }
     }
 
