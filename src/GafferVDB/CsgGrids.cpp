@@ -139,10 +139,10 @@ void CSGGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Context
 {
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
-	ScenePlug::ScenePath p ;
-	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p);
-	operationPlug()->hash( h );
-	h.append( otherPlug()->objectHash( p ) );
+	ScenePlug::ScenePath otherPath;
+	ScenePlug::stringToPath( vdbLocationPlug()->getValue(), otherPath );
+	h.append( operationPlug()->hash() );
+	h.append( otherPlug()->objectHash( otherPath ) );
 	h.append( gridPlug()->hash() );
 	h.append( vdbLocationPlug()->hash() );
 }
