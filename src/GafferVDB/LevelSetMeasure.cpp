@@ -36,6 +36,7 @@
 
 #include "GafferVDB/LevelSetMeasure.h"
 #include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Dispatcher.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -58,6 +59,60 @@ using namespace Gaffer;
 using namespace GafferScene;
 using namespace GafferVDB;
 
+namespace
+{
+    //! results of measuring the level set
+    struct Measurements
+    {
+        Measurements() : area(0.0), volume(0.0), averageMeanCurvature(0.0), valid(false), hasCurvature(false) {}
+
+        openvdb::Real area;
+        openvdb::Real volume;
+        openvdb::Real averageMeanCurvature;
+
+        bool valid;
+        bool hasCurvature;
+    };
+
+    //! The kernel of the measurement operation as a template to support different grid types
+    template<typename G>
+    class Measurer
+    {
+    public:
+
+        Measurements operator()( typename G::ConstPtr grid, const LevelSetMeasure* node, const Gaffer::Context* context) const
+        {
+            Interrupter interrupter( context->canceller() );
+
+            openvdb::tools::LevelSetMeasure<G, Interrupter> measure ( *grid, &interrupter );
+
+            Measurements measurements;
+            measurements.valid = true;
+
+            const bool calculateCurvature = node->curvaturePlug()->getValue();
+            const bool worldUnits = node->worldUnitsPlug()->getValue();
+
+            if ( calculateCurvature )
+            {
+                measure.measure( measurements.area, measurements.volume, measurements.averageMeanCurvature, worldUnits );
+                measurements.hasCurvature = true;
+            }
+            else
+            {
+                measure.measure( measurements.area, measurements.volume, worldUnits );
+            }
+
+            if ( interrupter.wasInterrupted() )
+            {
+                throw IECore::Cancelled();
+            }
+
+            return measurements;
+        }
+    };
+
+} // namespace
+
 IE_CORE_DEFINERUNTIMETYPED( LevelSetMeasure );
 
 size_t LevelSetMeasure::g_firstPlugIndex = 0;
@@ -68,6 +123,8 @@ LevelSetMeasure::LevelSetMeasure( const std::string &name )
 	storeIndexOfNextChild( g_firstPlugIndex );
 
 	addChild ( new StringPlug( "grids", Plug::In, "*" ) );
+    addChild ( new BoolPlug( "curvature", Plug::In, false ) );
+    addChild ( new BoolPlug( "worldUnits", Plug::In, false ) );
 
 	outPlug()->boundPlug()->setInput( inPlug()->boundPlug() );
 	outPlug()->objectPlug()->setInput( inPlug()->objectPlug() );
@@ -87,11 +144,31 @@ const Gaffer::StringPlug *LevelSetMeasure::gridsPlug() const
 	return getChild<const StringPlug>( g_firstPlugIndex );
 }
 
+Gaffer::BoolPlug *LevelSetMeasure::curvaturePlug()
+{
+    return getChild<BoolPlug>( g_firstPlugIndex + 1 );
+}
+
+const Gaffer::BoolPlug *LevelSetMeasure::curvaturePlug() const
+{
+    return getChild<const BoolPlug>( g_firstPlugIndex + 1 );
+}
+
+Gaffer::BoolPlug *LevelSetMeasure::worldUnitsPlug()
+{
+    return getChild<BoolPlug>( g_firstPlugIndex + 2 );
+}
+
+const Gaffer::BoolPlug *LevelSetMeasure::worldUnitsPlug() const
+{
+    return getChild<const BoolPlug>( g_firstPlugIndex + 2 );
+}
+
 void LevelSetMeasure::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if ( input == gridsPlug()  )
+	if ( input == gridsPlug() || input == curvaturePlug() || input == worldUnitsPlug() )
 	{
 		outputs.push_back( outPlug()->attributesPlug() );
 	}
@@ -107,7 +184,9 @@ void LevelSetMeasure::hashProcessedAttributes( const ScenePath &path, const Gaff
 	SceneElementProcessor::hashProcessedAttributes( path, context, h );
 
 	h.append( inPlug()->objectHash( path ) );
-	h.append( gridsPlug()->getValue() );
+	h.append( gridsPlug()->hash() );
+	h.append( curvaturePlug()->hash() );
+	h.append( worldUnitsPlug()->hash() );
 }
 
 IECore::ConstCompoundObjectPtr LevelSetMeasure::computeProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::ConstCompoundObjectPtr inputAttributes ) const
@@ -123,7 +202,8 @@ IECore::ConstCompoundObjectPtr LevelSetMeasure::computeProcessedAttributes( cons
 	std::string grids = gridsPlug()->getValue();
 
 	IECore::CompoundObjectPtr newAttributes = inputAttributes->copy();
-    Interrupter interrupter( context->canceller() );
+
+    ScalarGridDispatcher<Measurer, LevelSetMeasure, Measurements> measurer( this, context );
 
 	for ( const auto &gridName : gridNames )
 	{
@@ -131,27 +211,18 @@ IECore::ConstCompoundObjectPtr LevelSetMeasure::computeProcessedAttributes( cons
 		{
 			openvdb::GridBase::ConstPtr srcGrid = vdbObject->findGrid( gridName );
 
-			openvdb::FloatGrid::ConstPtr grid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+            Measurements measurements = measurer( srcGrid );
 
-			if ( !grid )
-			{
-				continue;
-			}
-
-			openvdb::tools::LevelSetMeasure<openvdb::FloatGrid, Interrupter> measure ( *grid, &interrupter );
-
-            if ( interrupter.wasInterrupted() )
+            if ( measurements.valid )
             {
-                throw IECore::Cancelled();
+                newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":area", new IECore::DoubleData( measurements.area ) ) );
+                newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":volume", new IECore::DoubleData( measurements.volume ) ) );
+
+                if ( measurements.hasCurvature )
+                {
+                    newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":averageMeanCurvature", new IECore::DoubleData( measurements.averageMeanCurvature ) ) );
+                }
             }
-
-			//void measure(Real& area, Real& volume, Real& avgMeanCurvature, bool useWorldUnits = true);
-			openvdb::Real area, volume, averageMeanCurvature;
-			measure.measure( area, volume, averageMeanCurvature );
-
-			newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":area", new IECore::FloatData( area) ) );
-			newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":volume", new IECore::FloatData( volume ) ) );
-			newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":averageMeanCurvature", new IECore::FloatData( averageMeanCurvature ) ) );
 		}
 	}
 
