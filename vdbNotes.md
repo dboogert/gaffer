@@ -80,11 +80,10 @@ LevelSetMeasure
     
 Trace rays against a level set / Volume
 Add mask to filtering and morphology            
-copy grids from one VDB into another
-fracture levelset
+Copy grids from one VDB into another
+Fracture levelset
 Advect points
-LevelSetAdvection
-OSL                                   
+LevelSetAdvection                              
 Ray Intersection
     * https://www.openvdb.org/documentation/doxygen/RayIntersector_8h.html                                                                                                                                                                                                                                                                                                                                                                                      
 Morph
@@ -92,7 +91,7 @@ Morph
 cast from different grid types
 
 Check nodes to see what support masks
-consistent grid namingn using a context variable evaluation
+consistent grid naming using a context variable evaluation
 how do I optimize bounds????!?!
 VDB Scene Writer
 Use latest base classes 
@@ -100,3 +99,15 @@ OSL VDB Merge
 
 Build 
     Missing inksapce doesn't give a decent warning in the cmake build 
+    
+    
+DeleteChannelsUI.py
+    - "plugValueWidget:type", "GafferImageUI.ChannelMaskPlugValueWidget",
+    
+    ChannelMaskPlugValueWidget ->  GafferUI.PlugValueWidget
+    
+    all
+    clear
+    [gridname] [fog | levelset] [type]  
+    
+    How can a simple context menu be assigned 
