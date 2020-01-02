@@ -162,40 +162,44 @@ IECore::ConstObjectPtr FilterGrids::computeProcessedObject( const ScenePath &pat
 
     Interrupter interrupter( context->canceller() );
 
+
 	for (const auto &gridName : grids )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
-		{
-			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
-			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
+		if ( !IECore::StringAlgo::matchMultiple( gridName, gridsToProcess ) )
+        {
+		    continue;
+        }
 
-			if ( floatGrid )
-			{
-				openvdb::FloatGrid::Ptr filteredGrid = floatGrid->deepCopy();
+        openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
 
-				openvdb::tools::Filter<openvdb::FloatGrid> filter ( *filteredGrid );
+        if ( floatGrid )
+        {
+            openvdb::FloatGrid::Ptr filteredGrid = floatGrid->deepCopy();
 
-				switch( filterType )
-				{
-					case 0:
-						filter.mean( width, iterations );
-						break;
-					case 1:
-						filter.gaussian( width, iterations );
-						break;
-					case 2:
-						filter.median( width, iterations );
-						break;
-				}
+            openvdb::tools::Filter<openvdb::FloatGrid, openvdb::FloatGrid::ValueConverter<float>::Type, Interrupter > filter ( *filteredGrid, &interrupter );
 
-                if ( interrupter.wasInterrupted() )
-                {
-                    throw IECore::Cancelled();
-                }
+            switch( filterType )
+            {
+                case 0:
+                    filter.mean( width, iterations );
+                    break;
+                case 1:
+                    filter.gaussian( width, iterations );
+                    break;
+                case 2:
+                    filter.median( width, iterations );
+                    break;
+            }
 
-				newVDBObject->insertGrid( filteredGrid );
-			}
-		}
+            if ( interrupter.wasInterrupted() )
+            {
+                throw IECore::Cancelled();
+            }
+
+            newVDBObject->insertGrid( filteredGrid );
+        }
+
 	}
 
 	return newVDBObject;
