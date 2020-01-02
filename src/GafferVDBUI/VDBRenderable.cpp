@@ -523,7 +523,7 @@ void VDBRenderable::render( IECoreGL::State *currentState ) const
             m_group->addChild( group );
         }
 
-        for(auto pointsData : collector.points )
+        for( auto pointsData : collector.points )
         {
             IECoreGL::Group *pointsGroup = new IECoreGL::Group();
 
