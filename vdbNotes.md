@@ -74,10 +74,8 @@ ScatterPointsInVolume
     - grid selector
     - canceller
     
-LevelSetMeasure (rename to MeasureLevelSet)
-    - canceller
-    - double grid
-    - add curvature option (without it the calculation is faster  )
+LevelSetMeasure 
+    - rename to MeasureLevelSet
     
     
 Trace rays against a level set / Volume
@@ -91,3 +89,14 @@ Ray Intersection
     * https://www.openvdb.org/documentation/doxygen/RayIntersector_8h.html                                                                                                                                                                                                                                                                                                                                                                                      
 Morph
     * https://www.openvdb.org/documentation/doxygen/LevelSetMorph_8h.html
+cast from different grid types
+
+Check nodes to see what support masks
+consistent grid namingn using a context variable evaluation
+how do I optimize bounds????!?!
+VDB Scene Writer
+Use latest base classes 
+OSL VDB Merge
+
+Build 
+    Missing inksapce doesn't give a decent warning in the cmake build 
