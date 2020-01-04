@@ -79,6 +79,12 @@ namespace GafferVDB
 		Gaffer::StringPlug *gridPlug();
 		const Gaffer::StringPlug *gridPlug() const;
 
+        Gaffer::StringPlug *velocityAttributePlug();
+        const Gaffer::StringPlug *velocityAttributePlug() const;
+
+        Gaffer::StringPlug *widthAttributePlug();
+        const Gaffer::StringPlug *widthAttributePlug() const;
+
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :

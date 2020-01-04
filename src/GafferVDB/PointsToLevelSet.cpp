@@ -66,17 +66,17 @@ namespace
 	{
 	public:
 
-		ParticleList( IECoreScene::ConstPrimitivePtr primitive, float radiusScale, float velocityScale )
+		ParticleList( IECoreScene::ConstPrimitivePtr primitive, float radiusScale, float velocityScale, const std::string &widthName, const std::string& velocityName )
 		: primitive( primitive ),
-          radiusScale(radiusScale),
-		  velocityScale(velocityScale)
+          radiusScale( radiusScale ),
+		  velocityScale( velocityScale )
 		{
 			auto data =  primitive->variables.find( "P" )->second.data;
 
 			auto vectorData = IECore::runTimeCast<IECore::V3fVectorData>( data );
 			positions = &vectorData->readable();
 
-			auto widthIt = primitive->variables.find( "width" );
+			auto widthIt = primitive->variables.find( widthName );
 
 			if ( widthIt != primitive->variables.end() )
             {
@@ -89,7 +89,7 @@ namespace
                 widths = nullptr;
 			}
 
-            auto velocityIt = primitive->variables.find( "velocity" );
+            auto velocityIt = primitive->variables.find( velocityName );
 
             if ( velocityIt != primitive->variables.end() )
             {
@@ -172,13 +172,16 @@ PointsToLevelSet::PointsToLevelSet( const std::string &name )
 
 	addChild( new GafferScene::ScenePlug( "in", Gaffer::Plug::In ) );
 
-	addChild( new StringPlug( "pointsLocation", Plug::In, "") );
-	addChild( new StringPlug( "grid", Plug::In, "") );
+	addChild( new StringPlug( "pointsLocation", Plug::In, "" ) );
+	addChild( new StringPlug( "grid", Plug::In, "" ) );
 
-    addChild( new FloatPlug( "radiusScale", Plug::In, 1.0f, 0.0f) );
-    addChild( new BoolPlug( "trails", Plug::In, false) );
-    addChild( new FloatPlug( "trailDelta", Plug::In, 0.5f) );
-    addChild( new FloatPlug( "velocityScale", Plug::In, 1.0f, 0.0f) );
+    addChild( new FloatPlug( "radiusScale", Plug::In, 1.0f, 0.0f ) );
+    addChild( new BoolPlug( "trails", Plug::In, false ) );
+    addChild( new FloatPlug( "trailDelta", Plug::In, 0.5f ) );
+    addChild( new FloatPlug( "velocityScale", Plug::In, 1.0f, 0.0f ) );
+
+    addChild( new StringPlug( "widthAttribute", Plug::In, "width" ) );
+    addChild( new StringPlug( "velocityAttribute", Plug::In, "velocity" ) );
 }
 
 PointsToLevelSet::~PointsToLevelSet()
@@ -255,13 +258,39 @@ const Gaffer::FloatPlug *PointsToLevelSet::velocityScalePlug() const
     return getChild<FloatPlug>( g_firstPlugIndex + 6 );
 }
 
+Gaffer::StringPlug *PointsToLevelSet::widthAttributePlug()
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 7);
+}
+
+const Gaffer::StringPlug *PointsToLevelSet::widthAttributePlug() const
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 7 );
+}
+
+Gaffer::StringPlug *PointsToLevelSet::velocityAttributePlug()
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 8 );
+}
+
+const Gaffer::StringPlug *PointsToLevelSet::velocityAttributePlug() const
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 8 );
+}
 
 void PointsToLevelSet::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridPlug() || input == pointsLocationPlug() || input == radiusScalePlug() || input == velocityScalePlug()
-	|| input == trailsPlug() || input == trailDeltaPlug() || input == otherPlug() )
+	if( input == gridPlug() ||
+	input == pointsLocationPlug() ||
+	input == radiusScalePlug() ||
+	input == velocityScalePlug() ||
+	input == trailsPlug() ||
+	input == trailDeltaPlug() ||
+	input == otherPlug()  ||
+	input == widthAttributePlug() ||
+	input == velocityAttributePlug())
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -288,6 +317,8 @@ void PointsToLevelSet::hashProcessedObject( const ScenePath &path, const Gaffer:
 	h.append( trailsPlug()->hash() );
 	h.append( velocityScalePlug()->hash() );
 	h.append( trailDeltaPlug()->hash() );
+	h.append( widthAttributePlug()->hash() );
+	h.append( velocityAttributePlug()->hash() );
 }
 
 IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -325,7 +356,7 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 
 	IECoreScene::ConstPrimitivePtr pointsPrimitive = runTimeCast<const IECoreScene::Primitive>( otherPlug()->object( pointsLocation ) );
 
-	ParticleList particleList( pointsPrimitive, radiusScalePlug()->getValue(), velocityScalePlug()->getValue() );
+	ParticleList particleList( pointsPrimitive, radiusScalePlug()->getValue(), velocityScalePlug()->getValue(), widthAttributePlug()->getValue(), velocityAttributePlug()->getValue() );
 
 	const bool rasteriseTrails = trailsPlug()->getValue() ;
 
