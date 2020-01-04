@@ -483,6 +483,7 @@ nodeMenu.append( "/VDB/VolumeToSpheres", GafferVDB.VolumeToSpheres, searchText =
 nodeMenu.append( "/VDB/Clip", GafferVDB.Clip, searchText = "Clip" )
 nodeMenu.append( "/VDB/LevelSetToFog", GafferVDB.LevelSetToFog, searchText="LevelSetToFog")
 nodeMenu.append( "/VDB/SegmentGrids", GafferVDB.SegmentGrids, searchText="SegmentGrids")
+nodeMenu.append( "/VDB/IntersectGrids", GafferVDB.IntersectGrids, searchText="IntersectGrids")
 
 # Dispatch nodes
 
