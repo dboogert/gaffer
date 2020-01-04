@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#  Copyright (c) 2015, John Haddon. All rights reserved.
+#  Copyright (c) 2020,  Don Boogert. All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 #        disclaimer in the documentation and/or other materials provided with
 #        the distribution.
 #
-#      * Neither the name of John Haddon nor the names of
+#      * Neither the name of Don Boogert nor the names of
 #        any other contributors to this software may be used to endorse or
 #        promote products derived from this software without specific prior
 #        written permission.
@@ -34,29 +34,19 @@
 #
 ##########################################################################
 
-from _GafferVDBUI import *
+import GafferUI
+import GafferVDB
 
-import LevelSetToMeshUI
-import MeshToLevelSetUI
-import LevelSetOffsetUI
-import PointsGridToPointsUI
-import DeleteGridsUI
-import ScatterPointsUI
-import AdvectGridsUI
-import MathOpUI
-import StatisticsUI
-import CSGGridsUI
-import TransformGridsUI
-import PointsToLevelSetUI
-import VDBObjectUI
-import SampleUI
-import FilterGridsUI
-import LevelSetMeasureUI
-import LevelSetFilterUI
-import VolumeToSpheresUI
-import ClipUI
-import LevelSetToFogUI
-import SegmentGridsUI
-import IntersectUI
-
-__import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )
+GafferUI.Metadata.registerNode(
+    GafferVDB.IntersectGrids,
+    'description',
+    """Intersect against grids of a VDB Object.""",
+    plugs={
+        'grids' : [
+            'description',
+            """
+            Names of grids to intersect against
+            """
+        ]
+    }
+)
