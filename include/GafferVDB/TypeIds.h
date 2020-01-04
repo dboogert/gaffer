@@ -65,6 +65,7 @@ enum TypeId
 	VolumeToSpheresTypeId = 110970,
     LevelSetToFogTypeId = 110971,
     SegmentGridsTypeId = 110972,
+    IntersectGridsTypeId = 110973,
 	LastTypeId = 110974
 };
 
