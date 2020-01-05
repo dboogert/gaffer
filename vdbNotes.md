@@ -78,11 +78,23 @@ Nodes to make:
    FractureLevelSets
    MorphLevelSets
    LevelSetPrimitive
+   SetBackgroundGrids
+   
+   DiagnosticsGrids
+   PlatonticLevelSet
+   SphereLevelSet
+   
+   CreateMaskGrid
     
    OffsetLevelSet 
         Interrupt
         outputGrid   
   
+  PruneGrids
+  PotentialFlow
+
+Update to Deformer base
+Discuss 2nd input scene locattions 
 use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
 FilterGrids - disable doesn't pass through input vdb
 grid naming attribute ${grid} context variable 
@@ -106,7 +118,6 @@ Check nodes to see what support masks
 how do I optimize bounds????!?!
 VDB Scene Writer
 Use latest base classes 
-OSL VDB Merge
 
 Build 
     Missing inksapce doesn't give a decent warning in the cmake build 
