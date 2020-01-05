@@ -176,7 +176,6 @@ void MorphLevelSets::hashProcessedObject(const ScenePath &path, const Gaffer::Co
 
 IECore::ConstObjectPtr MorphLevelSets::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
-    std::cerr << "--------compute " << std::endl;
     const IECoreVDB::VDBObject *vdbObject = runTimeCast<const IECoreVDB::VDBObject>( inputObject.get() );
     if ( !vdbObject )
     {
@@ -202,8 +201,6 @@ IECore::ConstObjectPtr MorphLevelSets::computeProcessedObject(const ScenePath &p
         {
             continue;
         }
-
-        std::cerr << "grid : " << gridName << std::endl;
 
         openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
         openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
