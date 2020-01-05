@@ -79,12 +79,12 @@ Nodes to make:
    MorphLevelSets
    LevelSetPrimitive
    SetBackgroundGrids
+   SphereLevelSet
+   PlatonticLevelSet
    
    DiagnosticsGrids
-   PlatonticLevelSet
-   SphereLevelSet
-   
-   CreateMaskGrid
+  
+   CreateMaskGrids
     
    OffsetLevelSet 
         Interrupt
@@ -93,6 +93,8 @@ Nodes to make:
   PruneGrids
   PotentialFlow
 
+SampleGrids can't sample non scalar (float ) values
+
 Update to Deformer base
 Discuss 2nd input scene locattions 
 use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
@@ -100,7 +102,6 @@ FilterGrids - disable doesn't pass through input vdb
 grid naming attribute ${grid} context variable 
 consistent grid naming using a context variable evaluation
 
-Merge this goodness into my VDB work : dboogert:OSLVDB
 
 Add mask to filtering and morphology            
 Copy grids from one VDB into another

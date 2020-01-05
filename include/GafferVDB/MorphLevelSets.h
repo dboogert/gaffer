@@ -48,18 +48,33 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API LevelSetMorph : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API MorphLevelSets : public GafferScene::SceneElementProcessor
 {
 
 	public :
 
-	LevelSetMorph(const std::string &name = defaultName<LevelSetMorph>() );
-	~LevelSetMorph();
+	MorphLevelSets(const std::string &name = defaultName<MorphLevelSets>() );
+	~MorphLevelSets();
 
-	IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::LevelSetMorph, LevelSetMorphTypeId, GafferScene::SceneElementProcessor );
+	IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::MorphLevelSets, MorphLevelSetsTypeId, GafferScene::SceneElementProcessor );
 
-	Gaffer::StringPlug *gridsPlug();
-	const Gaffer::StringPlug *gridsPlug() const;
+    GafferScene::ScenePlug *otherPlug();
+    const GafferScene::ScenePlug *otherPlug() const;
+
+    Gaffer::StringPlug *gridsPlug();
+    const Gaffer::StringPlug *gridsPlug() const;
+
+    Gaffer::StringPlug *outputGridPlug();
+    const Gaffer::StringPlug *outputGridPlug() const;
+
+    Gaffer::StringPlug *vdbLocationPlug();
+    const Gaffer::StringPlug *vdbLocationPlug() const;
+
+    Gaffer::FloatPlug *time0Plug();
+    const Gaffer::FloatPlug *time0Plug() const;
+
+    Gaffer::FloatPlug *time1Plug();
+    const Gaffer::FloatPlug *time1Plug() const;
 
 	virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
@@ -78,7 +93,7 @@ namespace GafferVDB
 	static size_t g_firstPlugIndex;
 };
 
-IE_CORE_DECLAREPTR( LevelSetMorph )
+IE_CORE_DECLAREPTR(MorphLevelSets )
 
 } // namespace GafferVDB
 

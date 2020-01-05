@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#  Copyright (c) 2015, John Haddon. All rights reserved.
+#  Copyright (c) 2020, Don Boogert. All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 #        disclaimer in the documentation and/or other materials provided with
 #        the distribution.
 #
-#      * Neither the name of John Haddon nor the names of
+#      * Neither the name of Don Boogert nor the names of
 #        any other contributors to this software may be used to endorse or
 #        promote products derived from this software without specific prior
 #        written permission.
@@ -34,30 +34,26 @@
 #
 ##########################################################################
 
-from _GafferVDBUI import *
+import GafferUI
+import GafferVDB
 
-import LevelSetToMeshUI
-import MeshToLevelSetUI
-import OffsetLevelSetUI
-import PointsGridToPointsUI
-import DeleteGridsUI
-import ScatterPointsUI
-import AdvectGridsUI
-import MathOpGridsUI
-import StatisticsGridsUI
-import CSGLevelSetsUI
-import TransformGridsUI
-import PointsToLevelSetUI
-import VDBObjectUI
-import SampleGridsUI
-import FilterGridsUI
-import MeasureLevelSetUI
-import FilterLevelSetUI
-import VolumeToSpheresUI
-import ClipGridsUI
-import LevelSetToFogUI
-import SegmentLevelSetsUI
-import IntersectGridsUI
-import MorphLevelSetsUI
+GafferUI.Metadata.registerNode(
+    GafferVDB.MorphLevelSets,
+    'description',
+    """Morph from one level set to another""",
+    plugs={
+        'grid' : [
+            'description',
+            """
+            Name of the level set grids to morph.
+            """
+        ],
+        'outputGrid' : [
+            'description',
+            """
+            Name of the output grid to create. The name of the input grid is stored in the context variable `${grid}`
+            """
+        ],
 
-__import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )
+    }
+)

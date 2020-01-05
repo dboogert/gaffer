@@ -153,12 +153,8 @@ private:
             float length = v;
             float newLength = spline( value.length() );
             addLine(0, grid->indexToWorld( bbox.getCenter()),  grid->indexToWorld( bbox.getCenter() + value * (newLength / length) ), colorSpline( v ));
-
         }
-
     }
-
-
 
 	template<typename GridType>
 	void collectTypedScalar( openvdb::GridBase::ConstPtr baseGrid, const IECore::Splineff& spline, const IECore::SplinefColor3f& colorSpline)

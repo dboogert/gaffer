@@ -44,8 +44,8 @@ enum TypeId
 {
 	ClipTypeId = 110950,
 	VDBObjectTypeId = 110951,
-	LevelSetMorphTypeId = 110952,
-	MeshToLevelSetTypeId = 110953,
+    MorphLevelSetsTypeId = 110952,
+	MeshToLevelSetTypeId = 110953   ,
 	LevelSetToMeshTypeId = 110954,
 	LevelSetOffsetTypeId = 110955,
 	PointsGridToPointsId = 110956,
