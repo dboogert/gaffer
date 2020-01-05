@@ -34,8 +34,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_CSGGRIDS_H
-#define GAFFERVDB_CSGGRIDS_H
+#ifndef GAFFERVDB_LEVELSETFILTER_H
+#define GAFFERVDB_LEVELSETFILTER_H
 
 #include "GafferVDB/Export.h"
 #include "GafferVDB/TypeIds.h"
@@ -48,27 +48,24 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API CSGGrids : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API FilterLevelSet : public GafferScene::SceneElementProcessor
 	{
 
 	public :
 
-		CSGGrids(const std::string &name = defaultName<CSGGrids>() );
-		~CSGGrids();
+		FilterLevelSet(const std::string &name = defaultName<FilterLevelSet>() );
+		~FilterLevelSet();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::CSGGrids, CSGGridsTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::FilterLevelSet, LevelSetFilterTypeId, GafferScene::SceneElementProcessor );
 
-		GafferScene::ScenePlug *otherPlug();
-		const GafferScene::ScenePlug *otherPlug() const;
+		Gaffer::IntPlug *filterTypePlug();
+		const Gaffer::IntPlug *filterTypePlug() const;
 
-		Gaffer::StringPlug *gridPlug();
-		const Gaffer::StringPlug *gridPlug() const;
+		Gaffer::StringPlug *gridsPlug();
+		const Gaffer::StringPlug *gridsPlug() const;
 
-		Gaffer::StringPlug *vdbLocationPlug();
-		const Gaffer::StringPlug *vdbLocationPlug() const;
-
-		Gaffer::IntPlug *operationPlug();
-		const Gaffer::IntPlug *operationPlug() const;
+        Gaffer::StringPlug *outputGridPlug();
+        const Gaffer::StringPlug *outputGridPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
@@ -87,9 +84,9 @@ namespace GafferVDB
 		static size_t g_firstPlugIndex;
 	};
 
-	IE_CORE_DECLAREPTR( CSGGrids )
+	IE_CORE_DECLAREPTR(FilterLevelSet )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_CSGGRIDS_H
+#endif // GAFFERVDB_LEVELSETFILTER_H
 

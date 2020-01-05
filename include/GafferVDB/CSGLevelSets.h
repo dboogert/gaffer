@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (c) 2017, Image Engine Design. All rights reserved.
+//  Copyright (c) 2018, Image Engine Design. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -34,8 +34,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_LEVELSET_OFFSET_H
-#define GAFFERVDB_LEVELSET_OFFSET_H
+#ifndef GAFFERVDB_CSGGRIDS_H
+#define GAFFERVDB_CSGGRIDS_H
 
 #include "GafferVDB/Export.h"
 #include "GafferVDB/TypeIds.h"
@@ -48,23 +48,32 @@
 namespace GafferVDB
 {
 
-class GAFFERVDB_API LevelSetOffset : public GafferScene::SceneElementProcessor
-{
+	class GAFFERVDB_API CSGLevelSets : public GafferScene::SceneElementProcessor
+	{
 
 	public :
 
-		LevelSetOffset(const std::string &name = defaultName<LevelSetOffset>() );
-		~LevelSetOffset() override;
+		CSGLevelSets(const std::string &name = defaultName<CSGLevelSets>() );
+		~CSGLevelSets();
 
-		GAFFER_GRAPHCOMPONENT_DECLARE_TYPE( GafferVDB::LevelSetOffset, LevelSetOffsetTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::CSGLevelSets, CSGGridsTypeId, GafferScene::SceneElementProcessor );
+
+		GafferScene::ScenePlug *otherPlug();
+		const GafferScene::ScenePlug *otherPlug() const;
 
 		Gaffer::StringPlug *gridPlug();
 		const Gaffer::StringPlug *gridPlug() const;
 
-		Gaffer::FloatPlug *offsetPlug();
-		const Gaffer::FloatPlug *offsetPlug() const;
+        Gaffer::StringPlug *outputGridPlug();
+        const Gaffer::StringPlug *outputGridPlug() const;
 
-		void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
+		Gaffer::StringPlug *vdbLocationPlug();
+		const Gaffer::StringPlug *vdbLocationPlug() const;
+
+		Gaffer::IntPlug *operationPlug();
+		const Gaffer::IntPlug *operationPlug() const;
+
+		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
 
@@ -79,10 +88,11 @@ class GAFFERVDB_API LevelSetOffset : public GafferScene::SceneElementProcessor
 	private:
 
 		static size_t g_firstPlugIndex;
-};
+	};
 
-IE_CORE_DECLAREPTR( LevelSetOffset )
+	IE_CORE_DECLAREPTR(CSGLevelSets )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_LEVELSET_OFFSET_H
+#endif // GAFFERVDB_CSGGRIDS_H
+

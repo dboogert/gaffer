@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#  Copyright (c) 2017, Image Engine Design Inc. All rights reserved.
+#  Copyright (c) 2018, Image Engine Design Inc. All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -38,21 +38,34 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-	GafferVDB.LevelSetOffset,
-	'description',
-	"""Erodes or dilates a level set VDB.""",
-	plugs={
-		'grid' : [
-			'description',
-			"""
-			Name of the level set grid to offset in the VDB object.
-			"""
-		],
-		'offset' : [
-			'description',
-			"""
-			Amount to offset the level set by in voxel units. A positive number will erode the surface and negative will dilate.
-			"""
-		],
-	}
+    GafferVDB.ClipGrids,
+    'description',
+    """Clip grids against bounding box, frustrum or active tiles""",
+    plugs={
+        'clipLocation' : [
+            'description',
+            """
+            **in1** clip geometry scene graph location 
+            """
+        ],
+        'grids' : [
+            'description',
+            """
+            Names of grids to clip.
+            """
+        ],
+        'outputGrid' : [
+            'description',
+            """
+            Name of the output grid to create. The name of the input grid is stored in the context variable `${grid}`
+            """
+        ],
+        'invert' : [
+            'description',
+            """
+            If enabled the the voxels inside the clip geometry is discarded and the geometry outside kept.
+            """
+        ],
+
+    }
 )

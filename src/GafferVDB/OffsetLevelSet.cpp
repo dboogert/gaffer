@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/LevelSetOffset.h"
+#include "GafferVDB/OffsetLevelSet.h"
 
 #include "IECoreVDB/VDBObject.h"
 
@@ -50,11 +50,11 @@ using namespace IECoreVDB;
 using namespace Gaffer;
 using namespace GafferVDB;
 
-GAFFER_GRAPHCOMPONENT_DEFINE_TYPE( LevelSetOffset );
+GAFFER_GRAPHCOMPONENT_DEFINE_TYPE(OffsetLevelSet );
 
-size_t LevelSetOffset::g_firstPlugIndex = 0;
+size_t OffsetLevelSet::g_firstPlugIndex = 0;
 
-LevelSetOffset::LevelSetOffset( const std::string &name )
+OffsetLevelSet::OffsetLevelSet(const std::string &name )
 	:	SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
@@ -63,31 +63,31 @@ LevelSetOffset::LevelSetOffset( const std::string &name )
 	addChild( new FloatPlug( "offset", Plug::In, 0.5) );
 }
 
-LevelSetOffset::~LevelSetOffset()
+OffsetLevelSet::~OffsetLevelSet()
 {
 }
 
-Gaffer::StringPlug *LevelSetOffset::gridPlug()
-{
-	return  getChild<StringPlug>( g_firstPlugIndex );
-}
-
-const Gaffer::StringPlug *LevelSetOffset::gridPlug() const
+Gaffer::StringPlug *OffsetLevelSet::gridPlug()
 {
 	return  getChild<StringPlug>( g_firstPlugIndex );
 }
 
-Gaffer::FloatPlug *LevelSetOffset::offsetPlug()
+const Gaffer::StringPlug *OffsetLevelSet::gridPlug() const
+{
+	return  getChild<StringPlug>( g_firstPlugIndex );
+}
+
+Gaffer::FloatPlug *OffsetLevelSet::offsetPlug()
 {
 	return  getChild<FloatPlug>( g_firstPlugIndex + 1 );
 }
 
-const Gaffer::FloatPlug *LevelSetOffset::offsetPlug() const
+const Gaffer::FloatPlug *OffsetLevelSet::offsetPlug() const
 {
 	return  getChild<FloatPlug>( g_firstPlugIndex + 1 );
 }
 
-void LevelSetOffset::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+void OffsetLevelSet::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
@@ -98,12 +98,12 @@ void LevelSetOffset::affects( const Gaffer::Plug *input, AffectedPlugsContainer 
 	}
 }
 
-bool LevelSetOffset::processesObject() const
+bool OffsetLevelSet::processesObject() const
 {
 	return true;
 }
 
-void LevelSetOffset::hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void OffsetLevelSet::hashProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
@@ -111,7 +111,7 @@ void LevelSetOffset::hashProcessedObject( const ScenePath &path, const Gaffer::C
 	offsetPlug()->hash( h );
 }
 
-IECore::ConstObjectPtr LevelSetOffset::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
+IECore::ConstObjectPtr OffsetLevelSet::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	const VDBObject *vdbObject = runTimeCast<const VDBObject>(inputObject.get());
 	if( !vdbObject )
@@ -157,12 +157,12 @@ IECore::ConstObjectPtr LevelSetOffset::computeProcessedObject( const ScenePath &
 }
 
 
-bool LevelSetOffset::processesBound() const
+bool OffsetLevelSet::processesBound() const
 {
 	return true;
 }
 
-void LevelSetOffset::hashProcessedBound( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void OffsetLevelSet::hashProcessedBound(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedBound( path, context, h );
 
@@ -170,7 +170,7 @@ void LevelSetOffset::hashProcessedBound( const ScenePath &path, const Gaffer::Co
 	offsetPlug()->hash( h );
 }
 
-Imath::Box3f LevelSetOffset::computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const
+Imath::Box3f OffsetLevelSet::computeProcessedBound(const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const
 {
 	Imath::Box3f newBound = inputBound;
 	float offset = -offsetPlug()->getValue();

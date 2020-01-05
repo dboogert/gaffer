@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (c) 2018, Image Engine Design. All rights reserved.
+//  Copyright (c) 2017, Image Engine Design. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -34,15 +34,13 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_SAMPLE_H
-#define GAFFERVDB_SAMPLE_H
+#ifndef GAFFERVDB_LEVELSET_OFFSET_H
+#define GAFFERVDB_LEVELSET_OFFSET_H
 
 #include "GafferVDB/Export.h"
 #include "GafferVDB/TypeIds.h"
 
 #include "GafferScene/SceneElementProcessor.h"
-
-#include "GafferScene/ScenePlug.h"
 
 #include "Gaffer/NumericPlug.h"
 #include "Gaffer/StringPlug.h"
@@ -50,32 +48,23 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API Sample : public GafferScene::SceneElementProcessor
-	{
+class GAFFERVDB_API OffsetLevelSet : public GafferScene::SceneElementProcessor
+{
 
 	public :
 
-		Sample(const std::string &name = defaultName<Sample>() );
-		~Sample();
+		OffsetLevelSet(const std::string &name = defaultName<OffsetLevelSet>() );
+		~OffsetLevelSet() override;
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::Sample, SampleTypeId, GafferScene::SceneElementProcessor );
+		GAFFER_GRAPHCOMPONENT_DECLARE_TYPE(GafferVDB::OffsetLevelSet, LevelSetOffsetTypeId, GafferScene::SceneElementProcessor );
 
-		GafferScene::ScenePlug *otherPlug();
-		const GafferScene::ScenePlug *otherPlug() const;
+		Gaffer::StringPlug *gridPlug();
+		const Gaffer::StringPlug *gridPlug() const;
 
-		Gaffer::StringPlug *gridsPlug();
-		const Gaffer::StringPlug *gridsPlug() const;
+		Gaffer::FloatPlug *offsetPlug();
+		const Gaffer::FloatPlug *offsetPlug() const;
 
-		Gaffer::StringPlug *vdbLocationPlug();
-		const Gaffer::StringPlug *vdbLocationPlug() const;
-
-		Gaffer::StringPlug *positionPlug();
-		const Gaffer::StringPlug *positionPlug() const;
-
-		Gaffer::IntPlug *interpolationPlug();
-		const Gaffer::IntPlug *interpolationPlug() const;
-
-		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
+		void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
 
@@ -83,14 +72,17 @@ namespace GafferVDB
 		void hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
 		IECore::ConstObjectPtr computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const override;
 
+		bool processesBound() const override;
+		void hashProcessedBound( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		Imath::Box3f computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const override;
+
 	private:
 
 		static size_t g_firstPlugIndex;
-	};
+};
 
-	IE_CORE_DECLAREPTR( Sample )
+IE_CORE_DECLAREPTR(OffsetLevelSet )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_SAMPLE_H
-
+#endif // GAFFERVDB_LEVELSET_OFFSET_H

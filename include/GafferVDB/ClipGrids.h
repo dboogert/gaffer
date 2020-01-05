@@ -48,25 +48,30 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API Clip : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API ClipGrids : public GafferScene::SceneElementProcessor
 	{
 
 	public :
 
-		Clip(const std::string &name = defaultName<Clip>() );
-		~Clip();
+		ClipGrids( const std::string &name = defaultName<ClipGrids>() );
+		~ClipGrids();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::Clip, ClipTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::ClipGrids, ClipTypeId, GafferScene::SceneElementProcessor );
 
 		GafferScene::ScenePlug *otherPlug();
 		const GafferScene::ScenePlug *otherPlug() const;
 
+        Gaffer::StringPlug *clipLocationPlug();
+        const Gaffer::StringPlug *clipLocationPlug() const;
+
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
 
-		Gaffer::StringPlug *vdbLocationPlug();
-		const Gaffer::StringPlug *vdbLocationPlug() const;
+		Gaffer::StringPlug *outputGridPlug();
+		const Gaffer::StringPlug *outputGridPlug() const;
 
+        Gaffer::BoolPlug *invertPlug();
+        const Gaffer::BoolPlug *invertPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
@@ -85,7 +90,7 @@ namespace GafferVDB
 		static size_t g_firstPlugIndex;
 	};
 
-	IE_CORE_DECLAREPTR( Clip )
+	IE_CORE_DECLAREPTR( ClipGrids )
 
 } // namespace GafferVDB
 

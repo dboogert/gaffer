@@ -64,13 +64,12 @@ LevelSetToFog::LevelSetToFog( const std::string &name )
 {
 	storeIndexOfNextChild(g_firstPlugIndex);
 
-	addChild( new StringPlug( "grids", Plug::In, "surface" ) );
+	addChild( new StringPlug( "grids", Plug::In, "*" ) );
 }
 
 LevelSetToFog::~LevelSetToFog()
 {
 }
-
 
 Gaffer::StringPlug *LevelSetToFog::gridsPlug()
 {
@@ -81,8 +80,6 @@ const Gaffer::StringPlug *LevelSetToFog::gridsPlug() const
 {
 	return  getChild<StringPlug>( g_firstPlugIndex );
 }
-
-
 
 void LevelSetToFog::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
@@ -119,25 +116,26 @@ IECore::ConstObjectPtr LevelSetToFog::computeProcessedObject( const ScenePath &p
 
 	std::string gridsToProcess = gridsPlug()->getValue();
 
-
 	IECoreVDB::VDBObjectPtr newVDBObject = vdbObject->copy();
 
 	for (const auto &gridName : grids )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
+		if ( !IECore::StringAlgo::matchMultiple(gridName, gridsToProcess))
 		{
-			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
-			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
-
-			if ( floatGrid )
-			{
-				openvdb::FloatGrid::Ptr fogGrid = floatGrid->deepCopy();
-
-				openvdb::tools::sdfToFogVolume( *fogGrid );
-
-				newVDBObject->insertGrid( fogGrid );
-			}
+            continue;
 		}
+
+        openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
+
+        if ( !floatGrid )
+        {
+            continue;
+        }
+
+        openvdb::FloatGrid::Ptr fogGrid = floatGrid->deepCopy();
+        openvdb::tools::sdfToFogVolume( *fogGrid );
+        newVDBObject->insertGrid( fogGrid );
 	}
 
 	return newVDBObject;

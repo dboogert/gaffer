@@ -38,30 +38,38 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.MathOp,
+    GafferVDB.CSGLevelSets,
     'description',
-    """Perform Mathematical operation on field""",
+    """Perform CSG on levelset grids""",
     plugs={
-        'grids' : [
+        'vdbLocation' : [
             'description',
             """
-            Names of the grids to be operated on
+            path of vdb object B
             """
         ],
-        'type' : [
+        'grid' : [
             'description',
             """
-            Type of operation
+            name of levelset grid
+            """
+        ],
+        'outputGrid' : [
+            'description',
+            """
+            Name of the output grid to create. The name of the input grid is stored in the context variable `${grid}`
+            """
+        ],
+        'operation' : [
+            'operation',
+            """
+            CSG operation
             """,
             "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
-            "preset:gadient", 0,
-            "preset:lapacian", 1,
-            "preset:divergence", 2,
-            "preset:curl", 3,
-            "preset:magnitude", 4,
-            "preset:normalize", 5,
-            "preset:meanCurvature", 6,
-        ],
-
+            "preset:A union B", 0,
+            "preset:A intersection B", 1,
+            "preset:A difference B", 2,
+            "preset:B difference A", 3
+        ]
     }
 )

@@ -64,6 +64,9 @@ namespace GafferVDB
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
 
+        Gaffer::StringPlug *outputGridPlug();
+        const Gaffer::StringPlug *outputGridPlug() const;
+
 		Gaffer::IntPlug *widthPlug();
 		const Gaffer::IntPlug *widthPlug() const;
 

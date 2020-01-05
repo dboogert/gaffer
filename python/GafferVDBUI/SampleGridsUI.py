@@ -38,15 +38,34 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.Statistics,
+    GafferVDB.SampleGrids,
     'description',
-    """Calculate statistics (min, max, mean and standard devition ) for grids""",
+    """Sample VDB Grid at points defined by a Points Primitive""",
+
     plugs={
+        'vdbLocation' : [
+            'description',
+            """
+            Scene graph location of the VDB object to sample
+            """
+        ],
         'grids' : [
             'description',
             """
-            Names of grids to generate statistics for.
+            Names of grid to sample.
             """
-        ]
+        ],
+        'position' : [
+            'description',
+            """
+            name of position attribute on points objects to use for vdb sampling
+            """
+        ],
+        'interpolation' : [
+            'description',
+            """
+           
+            """
+        ],
     }
 )

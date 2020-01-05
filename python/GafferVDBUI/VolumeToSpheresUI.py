@@ -47,6 +47,42 @@ GafferUI.Metadata.registerNode(
             """
             Names of grids to generate points inside.
             """
-        ]
+        ],
+        "miinSpheres" : [
+            'description',
+            """
+            Minimum number of spheres to create
+            """
+        ],
+        "maxSpheres" : [
+            'description',
+            """
+            Maximum number of spheres to create
+            """
+        ],
+        "overlapping" : [
+            'description',
+            """
+            Spheres are prevented from overlapping unless this is selected
+            """
+        ],
+        "minRadius" : [
+            'description',
+            """
+            Minimum radius possible for generated spheres.
+            """
+        ],
+        "maxRadius" : [
+            'description',
+            """
+            Maximum radius possible for generated spheres.
+            """
+        ],
+        "isoValue" : [
+            'description',
+            """
+            Level Set iso value which defines the surface to fill with Spheres.
+            """
+        ],
     }
 )

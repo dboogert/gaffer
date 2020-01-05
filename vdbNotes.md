@@ -17,13 +17,13 @@
     * add suffix plug (consider if this is worth it?)
     * Would be really handy to generate grids in code for testing
     * Does it work on LevelSet or Fog?       
-* [?] [1 VDB input] MathOp
+* [?] [1 VDB input] MathOpGrids
     * Works on scalars or Vectors 
         * Weird combination of grad(S) -> V , laplacian(S) -> S, div(V) -> S, curl(V) ->V , curvature(S-L) -> S
-* [LF][1 VDB input] Statistics
+* [LF][1 VDB input] StatisticsGrids
     * (S, V, S-L) 
     * rename attribute to statistics:[grid]:[stat]
-* [L] [2 VDB inputs] CSGGrids
+* [L] [2 VDB inputs] CSGLevelSets
     * (S-L) # (S-L) -> (S-L)
         * needs to work with other scalar grids
     * PROBLEM - mesh to level set - the grid isn't visible because of the grid rendering
@@ -49,22 +49,18 @@ Interupt long running operations
 How can i make sure there is always something visualised
 
 points to level set 
-    - attribute transfer from particles to surface
-    - Canceller
+    - attribute transfer from particles to surface (leave this to v2.0)
     - S-L # Points -> S-L
-    - define attribute names (width, velocity)
     - double SDF!
 
-SegmentGrids (rename to SegmentLevelSet?)
+SegmentLevelSets
     - double SDF
     
 VolumeToSpheres
     - works on Scalar field and LS
     - double type
-    - UI tooltips
-    - interupt processing
-    
-CSGGrids (rename to CSGLevelSets)
+
+CSGLevelSets
     - grid selector UI
     - separate grid name for 2nd input ?
     - tool tips
@@ -72,26 +68,26 @@ CSGGrids (rename to CSGLevelSets)
 ScatterPointsInVolume 
     - float / double scalar grid
     - grid selector
-    - canceller
-    
-LevelSetMeasure 
-    - rename to MeasureLevelSet
     
     
-Trace rays against a level set / Volume
+use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
+FilterGrids - disable doesn't pass through input vdb
+grid naming attribute ${grid} context variable 
+consistent grid naming using a context variable evaluation
+
 Add mask to filtering and morphology            
 Copy grids from one VDB into another
 Fracture levelset
 Advect points
 LevelSetAdvection                              
-Ray Intersection
+Trace rays against a level set / Volume
     * https://www.openvdb.org/documentation/doxygen/RayIntersector_8h.html                                                                                                                                                                                                                                                                                                                                                                                      
 Morph
     * https://www.openvdb.org/documentation/doxygen/LevelSetMorph_8h.html
 cast from different grid types
 
 Check nodes to see what support masks
-consistent grid naming using a context variable evaluation
+
 how do I optimize bounds????!?!
 VDB Scene Writer
 Use latest base classes 

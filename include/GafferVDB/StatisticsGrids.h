@@ -34,13 +34,15 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_LEVELSETFILTER_H
-#define GAFFERVDB_LEVELSETFILTER_H
+#ifndef GAFFERVDB_STATISTICS_H
+#define GAFFERVDB_STATISTICS_H
 
 #include "GafferVDB/Export.h"
 #include "GafferVDB/TypeIds.h"
 
 #include "GafferScene/SceneElementProcessor.h"
+
+#include "GafferScene/ScenePlug.h"
 
 #include "Gaffer/NumericPlug.h"
 #include "Gaffer/StringPlug.h"
@@ -48,42 +50,41 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API LevelSetFilter : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API StatisticsGrids : public GafferScene::SceneElementProcessor
 	{
 
 	public :
 
-		LevelSetFilter(const std::string &name = defaultName<LevelSetFilter>() );
-		~LevelSetFilter();
+		StatisticsGrids(const std::string &name = defaultName<StatisticsGrids>() );
+		~StatisticsGrids();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::LevelSetFilter, LevelSetFilterTypeId, GafferScene::SceneElementProcessor );
-
-		Gaffer::IntPlug *filterTypePlug();
-		const Gaffer::IntPlug *filterTypePlug() const;
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::StatisticsGrids, StatisticsTypeId, GafferScene::SceneElementProcessor );
 
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
+
+        Gaffer::BoolPlug *histogramPlug();
+        const Gaffer::BoolPlug *histogramPlug() const;
+
+        Gaffer::IntPlug *binsPlug();
+        const Gaffer::IntPlug *binsPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
 
-		bool processesObject() const override;
-		void hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
-		IECore::ConstObjectPtr computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const override;
-
-		bool processesBound() const override;
-		void hashProcessedBound( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
-		Imath::Box3f computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const override;
+		bool processesAttributes() const override;
+		void hashProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		IECore::ConstCompoundObjectPtr computeProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::ConstCompoundObjectPtr inputAttributes ) const override;
 
 	private:
 
 		static size_t g_firstPlugIndex;
 	};
 
-	IE_CORE_DECLAREPTR( LevelSetFilter )
+	IE_CORE_DECLAREPTR(StatisticsGrids )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_LEVELSETFILTER_H
+#endif // GAFFERVDB_STATISTICS_H
 

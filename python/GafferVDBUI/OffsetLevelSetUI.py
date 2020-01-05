@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#  Copyright (c) 2019, Don Boogert. All rights reserved.
+#  Copyright (c) 2017, Image Engine Design Inc. All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 #        disclaimer in the documentation and/or other materials provided with
 #        the distribution.
 #
-#      * Neither the name of Don Boogert nor the names of
+#      * Neither the name of Image Engine Design Inc nor the names of
 #        any other contributors to this software may be used to endorse or
 #        promote products derived from this software without specific prior
 #        written permission.
@@ -38,15 +38,21 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.SegmentGrids,
-    'description',
-    """Segment a level set grid in to multiple level set grids.""",
-    plugs={
-        'grids' : [
-            'description',
-            """
-            Names of grids to segment.
-            """
-        ]
-    }
+	GafferVDB.OffsetLevelSet,
+	'description',
+	"""Erodes or dilates a level set VDB.""",
+	plugs={
+		'grid' : [
+			'description',
+			"""
+			Name of the level set grid to offset in the VDB object.
+			"""
+		],
+		'offset' : [
+			'description',
+			"""
+			Amount to offset the level set by in voxel units. A positive number will erode the surface and negative will dilate.
+			"""
+		],
+	}
 )

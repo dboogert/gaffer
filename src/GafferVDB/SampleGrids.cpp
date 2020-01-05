@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/Sample.h"
+#include "GafferVDB/SampleGrids.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -58,11 +58,11 @@ using namespace Gaffer;
 using namespace GafferScene;
 using namespace GafferVDB;
 
-IE_CORE_DEFINERUNTIMETYPED( Sample );
+IE_CORE_DEFINERUNTIMETYPED(SampleGrids );
 
-size_t Sample::g_firstPlugIndex = 0;
+size_t SampleGrids::g_firstPlugIndex = 0;
 
-Sample::Sample( const std::string &name )
+SampleGrids::SampleGrids(const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
@@ -79,61 +79,61 @@ Sample::Sample( const std::string &name )
 	outPlug()->attributesPlug()->setInput( inPlug()->attributesPlug() );
 }
 
-Sample::~Sample()
+SampleGrids::~SampleGrids()
 {
 }
 
-GafferScene::ScenePlug *Sample::otherPlug()
-{
-	return  getChild<ScenePlug>( g_firstPlugIndex );
-}
-
-const GafferScene::ScenePlug *Sample::otherPlug() const
+GafferScene::ScenePlug *SampleGrids::otherPlug()
 {
 	return  getChild<ScenePlug>( g_firstPlugIndex );
 }
 
-Gaffer::StringPlug *Sample::vdbLocationPlug()
+const GafferScene::ScenePlug *SampleGrids::otherPlug() const
+{
+	return  getChild<ScenePlug>( g_firstPlugIndex );
+}
+
+Gaffer::StringPlug *SampleGrids::vdbLocationPlug()
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
 
-const Gaffer::StringPlug *Sample::vdbLocationPlug() const
+const Gaffer::StringPlug *SampleGrids::vdbLocationPlug() const
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
 
-Gaffer::StringPlug *Sample::gridsPlug()
+Gaffer::StringPlug *SampleGrids::gridsPlug()
 {
 	return getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
-const Gaffer::StringPlug *Sample::gridsPlug() const
+const Gaffer::StringPlug *SampleGrids::gridsPlug() const
 {
 	return getChild<const StringPlug>( g_firstPlugIndex + 2);
 }
 
-Gaffer::StringPlug *Sample::positionPlug()
+Gaffer::StringPlug *SampleGrids::positionPlug()
 {
 	return getChild<StringPlug>( g_firstPlugIndex + 3 );
 }
 
-const Gaffer::StringPlug *Sample::positionPlug() const
+const Gaffer::StringPlug *SampleGrids::positionPlug() const
 {
 	return getChild<const StringPlug>( g_firstPlugIndex + 3 );
 }
 
-Gaffer::IntPlug *Sample::interpolationPlug()
+Gaffer::IntPlug *SampleGrids::interpolationPlug()
 {
 	return getChild<IntPlug>( g_firstPlugIndex + 4 );
 }
 
-const Gaffer::IntPlug *Sample::interpolationPlug() const
+const Gaffer::IntPlug *SampleGrids::interpolationPlug() const
 {
 	return getChild<const IntPlug>( g_firstPlugIndex + 4 );
 }
 
-void Sample::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+void SampleGrids::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
@@ -148,12 +148,12 @@ void Sample::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs
 	}
 }
 
-bool Sample::processesObject() const
+bool SampleGrids::processesObject() const
 {
 	return true;
 }
 
-void Sample::hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void SampleGrids::hashProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
@@ -168,7 +168,7 @@ void Sample::hashProcessedObject( const ScenePath &path, const Gaffer::Context *
 	h.append( interpolationPlug()->hash() );
 }
 
-IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
+IECore::ConstObjectPtr SampleGrids::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	const IECoreScene::Primitive *primitive = runTimeCast<const IECoreScene::Primitive>(inputObject.get());
 	if( !primitive )
@@ -195,7 +195,7 @@ IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, co
 	// todo transform to vdb objects space.
 	auto positionView = *optionalPositionView;
 
-	IECoreScene::PrimitiveVariable::Interpolation  interpolation = primitive->variables.find(positionPlug()->getValue())->second.interpolation;
+	IECoreScene::PrimitiveVariable::Interpolation  interpolation = primitive->variables.find( positionPlug()->getValue() )->second.interpolation;
 
 	std::vector<std::string> grids = vdbObject->gridNames();
 
@@ -205,35 +205,37 @@ IECore::ConstObjectPtr Sample::computeProcessedObject( const ScenePath &path, co
 
 	for (const auto &gridName : grids )
 	{
-		if ( IECore::StringAlgo::matchMultiple( gridName, gridsToSample ) )
+		if ( !IECore::StringAlgo::matchMultiple( gridName, gridsToSample ) )
 		{
-			openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
-			openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
+		    continue;
+        }
 
-			if ( floatGrid )
-			{
-				// todo template function for sampler type (box, point, quadratic)
-				openvdb::tools::GridSampler<openvdb::FloatGrid , openvdb::tools::BoxSampler> sampler( *floatGrid );
+        openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( grid );
 
-				// todo template function for dispatching to various GridTypes
-				IECore::FloatVectorDataPtr newPrimvarData = new IECore::FloatVectorData();
+        if ( !floatGrid )
+        {
+            continue;
+        }
+
+        // todo template function for sampler type (box, point, quadratic)
+        openvdb::tools::GridSampler<openvdb::FloatGrid , openvdb::tools::BoxSampler> sampler( *floatGrid );
+
+        // todo template function for dispatching to various GridTypes
+        IECore::FloatVectorDataPtr newPrimvarData = new IECore::FloatVectorData();
 
 
-				// sample the grid with multiple threads
-				for ( size_t i = 0; i < positionView.size(); ++i )
-				{
-					// todo convert template for openvdb <-> imath types
-					openvdb::FloatGrid::ValueType worldValue = sampler.wsSample(openvdb::Vec3R(positionView[i][0], positionView[i][1], positionView[i][2]));
-					newPrimvarData->writable().push_back(worldValue);
-				}
+        // sample the grid with multiple threads
+        for ( size_t i = 0; i < positionView.size(); ++i )
+        {
+            // todo convert template for openvdb <-> imath types
+            openvdb::FloatGrid::ValueType worldValue = sampler.wsSample(openvdb::Vec3R(positionView[i][0], positionView[i][1], positionView[i][2]));
+            newPrimvarData->writable().push_back(worldValue);
+        }
 
-				// todo think about overwriting existing primvar data
-				newPrimitive->variables[gridName] = IECoreScene::PrimitiveVariable(interpolation, newPrimvarData);
-			}
-		}
+        // todo think about overwriting existing primvar data
+        newPrimitive->variables[gridName] = IECoreScene::PrimitiveVariable(interpolation, newPrimvarData);
 	}
-
-
 
 	return newPrimitive;
 }

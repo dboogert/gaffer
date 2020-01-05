@@ -38,25 +38,25 @@ from _GafferVDBUI import *
 
 import LevelSetToMeshUI
 import MeshToLevelSetUI
-import LevelSetOffsetUI
+import OffsetLevelSetUI
 import PointsGridToPointsUI
 import DeleteGridsUI
 import ScatterPointsUI
 import AdvectGridsUI
-import MathOpUI
-import StatisticsUI
-import CSGGridsUI
+import MathOpGridsUI
+import StatisticsGridsUI
+import CSGLevelSetsUI
 import TransformGridsUI
 import PointsToLevelSetUI
 import VDBObjectUI
-import SampleUI
+import SampleGridsUI
 import FilterGridsUI
-import LevelSetMeasureUI
-import LevelSetFilterUI
+import MeasureLevelSetUI
+import FilterLevelSetUI
 import VolumeToSpheresUI
-import ClipUI
+import ClipGridsUI
 import LevelSetToFogUI
-import SegmentGridsUI
-import IntersectUI
+import SegmentLevelSetsUI
+import IntersectGridsUI
 
 __import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )

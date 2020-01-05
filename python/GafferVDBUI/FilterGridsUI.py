@@ -48,6 +48,12 @@ GafferUI.Metadata.registerNode(
             Names of grids to filter (info about matching rules? )
             """
         ],
+        'outputGrid' : [
+            'description',
+            """
+            Name of the output grid to create. The name of the input grid is stored in the context variable `${grid}`
+            """
+        ],
         'filterType' : [
             'description',
             """
@@ -58,5 +64,18 @@ GafferUI.Metadata.registerNode(
             "preset:gaussian", 1,
             "preset:median", 2
         ],
+
+        'width' : [
+            'description',
+            """
+            Number of voxels to filter over
+            """
+        ],
+        'iterations' : [
+            'description',
+            """
+            Apply the filter this many times
+            """
+        ]
     }
 )

@@ -61,6 +61,9 @@ namespace GafferVDB
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
 
+        Gaffer::IntPlug *minSpheresPlug();
+        const Gaffer::IntPlug *minSpheresPlug() const;
+
         Gaffer::IntPlug *maxSpheresPlug();
         const Gaffer::IntPlug *maxSpheresPlug() const;
 

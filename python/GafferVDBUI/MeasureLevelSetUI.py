@@ -38,32 +38,27 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.CSGGrids,
+    GafferVDB.MeasureLevelSet,
     'description',
-    """Perform CSG on levelset grids""",
+    """Calculate LevelSet area, volume & curvature for grids""",
     plugs={
-        'vdbLocation' : [
+        'grids' : [
             'description',
             """
-            path of vdb object B
+            Names of grids to generate measures for.
             """
         ],
-        'grid' : [
+        'curvature' : [
             'description',
             """
-            name of levelset grid
+            Calculate the mean curvature of the level set. Note this is much slower than calculating area & volume
             """
         ],
-        'operation' : [
-            'operation',
+        'worldUnits' : [
+            'description',
             """
-            CSG operation
-            """,
-            "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
-            "preset:A union B", 0,
-            "preset:A intersection B", 1,
-            "preset:A difference B", 2,
-            "preset:B difference A", 3
+            Calculate the metrics using world space units instead of index space.
+            """
         ]
     }
 )

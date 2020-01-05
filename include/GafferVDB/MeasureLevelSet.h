@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (c) 2019, Don Boogert. All rights reserved.
+//  Copyright (c) 2018, Image Engine Design. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 //        disclaimer in the documentation and/or other materials provided with
 //        the distribution.
 //
-//      * Neither the name of Don Boogert nor the names of
+//      * Neither the name of Image Engine Design nor the names of
 //        any other contributors to this software may be used to endorse or
 //        promote products derived from this software without specific prior
 //        written permission.
@@ -34,8 +34,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_SEGMENTGRIDS_H
-#define GAFFERVDB_SEGMENTGRIDS_H
+#ifndef GAFFERVDB_LEVELSETMEASURE_H
+#define GAFFERVDB_LEVELSETMEASURE_H
 
 #include "GafferVDB/Export.h"
 #include "GafferVDB/TypeIds.h"
@@ -50,35 +50,41 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API SegmentGrids : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API MeasureLevelSet : public GafferScene::SceneElementProcessor
 	{
 
 	public :
 
-		SegmentGrids(const std::string &name = defaultName<SegmentGrids>() );
-		~SegmentGrids();
+		MeasureLevelSet(const std::string &name = defaultName<MeasureLevelSet>() );
+		~MeasureLevelSet();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::SegmentGrids, SegmentGridsTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::MeasureLevelSet, LevelSetMeasureTypeId, GafferScene::SceneElementProcessor );
 
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
+
+        Gaffer::BoolPlug *curvaturePlug();
+        const Gaffer::BoolPlug *curvaturePlug() const;
+
+        Gaffer::BoolPlug *worldUnitsPlug();
+        const Gaffer::BoolPlug *worldUnitsPlug() const;
 
 		virtual void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
 
-        bool processesObject() const override;
-        void hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
-        IECore::ConstObjectPtr computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const override;
+		bool processesAttributes() const override;
+		void hashProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		IECore::ConstCompoundObjectPtr computeProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::ConstCompoundObjectPtr inputAttributes ) const override;
 
 	private:
 
 		static size_t g_firstPlugIndex;
 	};
 
-	IE_CORE_DECLAREPTR( SegmentGrids )
+	IE_CORE_DECLAREPTR(MeasureLevelSet )
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_SEGMENTGRIDS_H
+#endif // GAFFERVDB_LEVELSETMEASURE_H
 

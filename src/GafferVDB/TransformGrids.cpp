@@ -66,6 +66,7 @@ TransformGrids::TransformGrids( const std::string &name )
 	storeIndexOfNextChild(g_firstPlugIndex);
 
 	addChild( new StringPlug( "grids", Plug::In, "*" ) );
+    addChild( new StringPlug( "outputGrid", Plug::In, "${grid}" ) );
 	addChild( new TransformPlug( "transform", Plug::In, 0.0 ) );
 }
 
@@ -83,21 +84,31 @@ const Gaffer::StringPlug *TransformGrids::gridsPlug() const
 	return  getChild<StringPlug>( g_firstPlugIndex  );
 }
 
+Gaffer::StringPlug *TransformGrids::outputGridPlug()
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 1 );
+}
+
+const Gaffer::StringPlug *TransformGrids::outputGridPlug() const
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 1 );
+}
+
 Gaffer::TransformPlug *TransformGrids::transformPlug()
 {
-	return  getChild<TransformPlug>( g_firstPlugIndex + 1 );
+	return  getChild<TransformPlug>( g_firstPlugIndex + 2 );
 }
 
 const Gaffer::TransformPlug *TransformGrids::transformPlug() const
 {
-	return  getChild<TransformPlug>( g_firstPlugIndex + 1 );
+	return  getChild<TransformPlug>( g_firstPlugIndex + 2 );
 }
 
 void TransformGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == gridsPlug() ||  input == transformPlug() || input->parent() == transformPlug()  )
+	if( input == gridsPlug() ||  input == transformPlug() || input->parent() == transformPlug() || input->parent()->parent() == transformPlug() || input == outputGridPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -115,6 +126,7 @@ void TransformGrids::hashProcessedObject( const ScenePath &path, const Gaffer::C
 
 	transformPlug()->hash( h );
 	gridsPlug()->hash( h );
+	outputGridPlug()->hash( h );
 }
 
 IECore::ConstObjectPtr TransformGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
@@ -143,23 +155,34 @@ IECore::ConstObjectPtr TransformGrids::computeProcessedObject( const ScenePath &
 			convert( transformPlug()->translatePlug()->getValue() )
 			);
 
-	for (const auto &gridName : gridNames )
+	for ( const auto &gridName : gridNames )
 	{
-		if (IECore::StringAlgo::matchMultiple(gridName, grids))
+		if ( !IECore::StringAlgo::matchMultiple(gridName, grids) )
 		{
-			openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
+		    continue;
+        }
 
-			auto srcFloatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+        openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
 
-			openvdb::FloatGrid::Ptr newGrid ( new openvdb::FloatGrid() );
+        auto srcFloatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
 
-			auto outFloatGrid = srcFloatGrid->deepCopy();
+        if ( !srcFloatGrid )
+        {
+            continue;
+        }
 
-			transfomer.transformGrid<openvdb::tools::PointSampler>( *srcFloatGrid, *newGrid);
+        openvdb::FloatGrid::Ptr newGrid ( new openvdb::FloatGrid() );
+        Context::EditableScope scope( context );
+        scope.set( IECore::InternedString("grid"), gridName );
+        const std::string outGridName = context->substitute( outputGridPlug()->getValue() );
 
-			newGrid->setName( srcFloatGrid->getName() );
-			newVDBObject->insertGrid( newGrid );
-		}
+        newGrid->setName( outGridName );
+
+        auto outFloatGrid = srcFloatGrid->deepCopy();
+
+        transfomer.transformGrid<openvdb::tools::PointSampler>( *srcFloatGrid, *newGrid);
+
+        newVDBObject->insertGrid( newGrid );
 	}
 
 	return newVDBObject;

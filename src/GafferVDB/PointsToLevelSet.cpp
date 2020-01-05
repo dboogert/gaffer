@@ -288,9 +288,9 @@ void PointsToLevelSet::affects( const Gaffer::Plug *input, AffectedPlugsContaine
 	input == velocityScalePlug() ||
 	input == trailsPlug() ||
 	input == trailDeltaPlug() ||
-	input == otherPlug()  ||
+	input->parent() == otherPlug()  ||
 	input == widthAttributePlug() ||
-	input == velocityAttributePlug())
+	input == velocityAttributePlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
@@ -335,14 +335,14 @@ IECore::ConstObjectPtr PointsToLevelSet::computeProcessedObject( const ScenePath
 
 	openvdb::GridBase::Ptr grid = newVDBObject->findGrid( gridName );
 
-	if (!grid)
+	if ( !grid )
 	{
 		return inputObject;
 	}
 
 	openvdb::FloatGrid::Ptr floatGrid = openvdb::GridBase::grid<openvdb::FloatGrid>( grid );
 
-	if (!floatGrid)
+	if ( !floatGrid )
 	{
 		return inputObject;
 	}

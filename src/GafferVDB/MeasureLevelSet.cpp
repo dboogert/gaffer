@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/LevelSetMeasure.h"
+#include "GafferVDB/MeasureLevelSet.h"
 #include "GafferVDB/Interrupt.h"
 #include "GafferVDB/Dispatcher.h"
 
@@ -80,7 +80,7 @@ namespace
     {
     public:
 
-        Measurements operator()( typename G::ConstPtr grid, const LevelSetMeasure* node, const Gaffer::Context* context) const
+        Measurements operator()(typename G::ConstPtr grid, const MeasureLevelSet* node, const Gaffer::Context* context) const
         {
             Interrupter interrupter( context->canceller() );
 
@@ -113,11 +113,11 @@ namespace
 
 } // namespace
 
-IE_CORE_DEFINERUNTIMETYPED( LevelSetMeasure );
+IE_CORE_DEFINERUNTIMETYPED( MeasureLevelSet );
 
-size_t LevelSetMeasure::g_firstPlugIndex = 0;
+size_t MeasureLevelSet::g_firstPlugIndex = 0;
 
-LevelSetMeasure::LevelSetMeasure( const std::string &name )
+MeasureLevelSet::MeasureLevelSet(const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
@@ -130,41 +130,41 @@ LevelSetMeasure::LevelSetMeasure( const std::string &name )
 	outPlug()->objectPlug()->setInput( inPlug()->objectPlug() );
 }
 
-LevelSetMeasure::~LevelSetMeasure()
+MeasureLevelSet::~MeasureLevelSet()
 {
 }
 
-Gaffer::StringPlug *LevelSetMeasure::gridsPlug()
+Gaffer::StringPlug *MeasureLevelSet::gridsPlug()
 {
 	return getChild<StringPlug>( g_firstPlugIndex );
 }
 
-const Gaffer::StringPlug *LevelSetMeasure::gridsPlug() const
+const Gaffer::StringPlug *MeasureLevelSet::gridsPlug() const
 {
 	return getChild<const StringPlug>( g_firstPlugIndex );
 }
 
-Gaffer::BoolPlug *LevelSetMeasure::curvaturePlug()
+Gaffer::BoolPlug *MeasureLevelSet::curvaturePlug()
 {
     return getChild<BoolPlug>( g_firstPlugIndex + 1 );
 }
 
-const Gaffer::BoolPlug *LevelSetMeasure::curvaturePlug() const
+const Gaffer::BoolPlug *MeasureLevelSet::curvaturePlug() const
 {
     return getChild<const BoolPlug>( g_firstPlugIndex + 1 );
 }
 
-Gaffer::BoolPlug *LevelSetMeasure::worldUnitsPlug()
+Gaffer::BoolPlug *MeasureLevelSet::worldUnitsPlug()
 {
     return getChild<BoolPlug>( g_firstPlugIndex + 2 );
 }
 
-const Gaffer::BoolPlug *LevelSetMeasure::worldUnitsPlug() const
+const Gaffer::BoolPlug *MeasureLevelSet::worldUnitsPlug() const
 {
     return getChild<const BoolPlug>( g_firstPlugIndex + 2 );
 }
 
-void LevelSetMeasure::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+void MeasureLevelSet::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
@@ -174,12 +174,12 @@ void LevelSetMeasure::affects( const Gaffer::Plug *input, AffectedPlugsContainer
 	}
 }
 
-bool LevelSetMeasure::processesAttributes() const
+bool MeasureLevelSet::processesAttributes() const
 {
 	return true;
 }
 
-void LevelSetMeasure::hashProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void MeasureLevelSet::hashProcessedAttributes(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedAttributes( path, context, h );
 
@@ -189,7 +189,7 @@ void LevelSetMeasure::hashProcessedAttributes( const ScenePath &path, const Gaff
 	h.append( worldUnitsPlug()->hash() );
 }
 
-IECore::ConstCompoundObjectPtr LevelSetMeasure::computeProcessedAttributes( const ScenePath &path, const Gaffer::Context *context, IECore::ConstCompoundObjectPtr inputAttributes ) const
+IECore::ConstCompoundObjectPtr MeasureLevelSet::computeProcessedAttributes(const ScenePath &path, const Gaffer::Context *context, IECore::ConstCompoundObjectPtr inputAttributes ) const
 {
 	auto vdbObject = IECore::runTimeCast<const IECoreVDB::VDBObject> ( inPlug()->object( path ) );
 
@@ -203,27 +203,30 @@ IECore::ConstCompoundObjectPtr LevelSetMeasure::computeProcessedAttributes( cons
 
 	IECore::CompoundObjectPtr newAttributes = inputAttributes->copy();
 
-    ScalarGridDispatcher<Measurer, LevelSetMeasure, Measurements> measurer( this, context );
+    ScalarGridDispatcher<Measurer, MeasureLevelSet, Measurements> measurer(this, context );
 
 	for ( const auto &gridName : gridNames )
 	{
-		if ( IECore::StringAlgo::matchMultiple( gridName, grids ) )
+		if ( !IECore::StringAlgo::matchMultiple( gridName, grids ) )
 		{
-			openvdb::GridBase::ConstPtr srcGrid = vdbObject->findGrid( gridName );
+            continue;
+        }
 
-            Measurements measurements = measurer( srcGrid );
+        openvdb::GridBase::ConstPtr srcGrid = vdbObject->findGrid( gridName );
 
-            if ( measurements.valid )
+        Measurements measurements = measurer( srcGrid );
+
+        if ( measurements.valid )
+        {
+            newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":area", new IECore::DoubleData( measurements.area ) ) );
+            newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":volume", new IECore::DoubleData( measurements.volume ) ) );
+
+            if ( measurements.hasCurvature )
             {
-                newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":area", new IECore::DoubleData( measurements.area ) ) );
-                newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":volume", new IECore::DoubleData( measurements.volume ) ) );
-
-                if ( measurements.hasCurvature )
-                {
-                    newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":averageMeanCurvature", new IECore::DoubleData( measurements.averageMeanCurvature ) ) );
-                }
+                newAttributes->members().insert(std::make_pair( std::string("levelset:") + gridName + ":averageMeanCurvature", new IECore::DoubleData( measurements.averageMeanCurvature ) ) );
             }
-		}
+        }
+
 	}
 
 	return newAttributes;

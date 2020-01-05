@@ -136,7 +136,7 @@ IECore::ConstObjectPtr LevelSetMorph::computeProcessedObject( const ScenePath &p
 //			{
 //				openvdb::FloatGrid::Ptr filteredGrid = floatGrid->deepCopy();
 //
-//				openvdb::tools::LevelSetFilter<openvdb::FloatGrid> filter ( *filteredGrid );
+//				openvdb::tools::FilterLevelSet<openvdb::FloatGrid> filter ( *filteredGrid );
 //
 //				switch( filterType )
 //				{

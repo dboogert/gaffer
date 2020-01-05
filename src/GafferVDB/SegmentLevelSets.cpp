@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/SegmentGrids.h"
+#include "GafferVDB/SegmentLevelSets.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -57,56 +57,68 @@ using namespace Gaffer;
 using namespace GafferScene;
 using namespace GafferVDB;
 
-IE_CORE_DEFINERUNTIMETYPED( SegmentGrids );
+IE_CORE_DEFINERUNTIMETYPED(SegmentLevelSets );
 
-size_t SegmentGrids::g_firstPlugIndex = 0;
+size_t SegmentLevelSets::g_firstPlugIndex = 0;
 
-SegmentGrids::SegmentGrids( const std::string &name )
+SegmentLevelSets::SegmentLevelSets(const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
 
 	addChild ( new StringPlug( "grids", Plug::In, "*" ) );
+    addChild ( new StringPlug( "outputGrid", Plug::In, "${grid}_${segment}" ) );
 }
 
-SegmentGrids::~SegmentGrids()
+SegmentLevelSets::~SegmentLevelSets()
 {
 }
 
-Gaffer::StringPlug *SegmentGrids::gridsPlug()
+Gaffer::StringPlug *SegmentLevelSets::gridsPlug()
 {
 	return getChild<StringPlug>( g_firstPlugIndex );
 }
 
-const Gaffer::StringPlug *SegmentGrids::gridsPlug() const
+const Gaffer::StringPlug *SegmentLevelSets::gridsPlug() const
 {
 	return getChild<const StringPlug>( g_firstPlugIndex );
 }
 
-void SegmentGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+Gaffer::StringPlug *SegmentLevelSets::outputGridPlug()
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 1 );
+}
+
+const Gaffer::StringPlug *SegmentLevelSets::outputGridPlug() const
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 1 );
+}
+
+void SegmentLevelSets::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if ( input == gridsPlug()  )
+	if ( input == gridsPlug() || input == outputGridPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 	}
 }
 
-bool SegmentGrids::processesObject() const
+bool SegmentLevelSets::processesObject() const
 {
     return true;
 }
 
-void SegmentGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void SegmentLevelSets::hashProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
     SceneElementProcessor::hashProcessedObject( path, context, h );
 
     h.append( inPlug()->objectHash( path ) );
     h.append( gridsPlug()->getValue() );
+    h.append( outputGridPlug()->getValue() );
 }
 
-IECore::ConstObjectPtr SegmentGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
+IECore::ConstObjectPtr SegmentLevelSets::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	auto vdbObject = IECore::runTimeCast<const IECoreVDB::VDBObject> ( inPlug()->object( path ) );
 
@@ -136,14 +148,20 @@ IECore::ConstObjectPtr SegmentGrids::computeProcessedObject( const ScenePath &pa
             continue;
         }
 
+        Context::EditableScope scope( context );
+        scope.set( IECore::InternedString("grid"), gridName );
+
         std::vector<openvdb::FloatGrid::Ptr> segments;
         openvdb::tools::segmentSDF( *grid, segments );
 
         int i = 0;
-        for (auto segment : segments )
+        for ( auto segment : segments )
         {
-            segment->setName( boost::str(boost::format("segment_%i") % i++) );
+            scope.set( IECore::InternedString("segment"), i );
+            const std::string outGridName = context->substitute( outputGridPlug()->getValue() );
+            segment->setName( outGridName );
             newVDBObject->insertGrid( segment );
+            i++;
         }
 	}
 

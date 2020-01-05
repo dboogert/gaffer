@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/CsgGrids.h"
+#include "GafferVDB/CSGLevelSets.h"
 #include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
@@ -56,13 +56,13 @@ using namespace Gaffer;
 using namespace GafferVDB;
 using namespace GafferScene;
 
-IE_CORE_DEFINERUNTIMETYPED( CSGGrids );
+IE_CORE_DEFINERUNTIMETYPED(CSGLevelSets );
 
-size_t CSGGrids::g_firstPlugIndex = 0;
+size_t CSGLevelSets::g_firstPlugIndex = 0;
 
 // todo rename to CSGLevelSets
 
-CSGGrids::CSGGrids( const std::string &name )
+CSGLevelSets::CSGLevelSets(const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild(g_firstPlugIndex);
@@ -70,72 +70,88 @@ CSGGrids::CSGGrids( const std::string &name )
 	addChild( new ScenePlug( "in", Gaffer::Plug::In ) );
 
 	addChild( new StringPlug( "vdbLocation", Plug::In, "/vdb" ) );
-	addChild( new StringPlug( "grid", Plug::In, "density" ) );
+	addChild( new StringPlug( "grid", Plug::In, "surface" ) );
+    addChild( new StringPlug( "outputGrid", Plug::In, "${grid}" ) );
 	addChild( new IntPlug( "operation", Plug::In, 0) );
 
 }
 
-CSGGrids::~CSGGrids()
+CSGLevelSets::~CSGLevelSets()
 {
 }
 
-GafferScene::ScenePlug *CSGGrids::otherPlug()
-{
-	return  getChild<ScenePlug>( g_firstPlugIndex );
-}
-
-const GafferScene::ScenePlug *CSGGrids::otherPlug() const
+GafferScene::ScenePlug *CSGLevelSets::otherPlug()
 {
 	return  getChild<ScenePlug>( g_firstPlugIndex );
 }
 
-Gaffer::StringPlug *CSGGrids::vdbLocationPlug()
+const GafferScene::ScenePlug *CSGLevelSets::otherPlug() const
+{
+	return  getChild<ScenePlug>( g_firstPlugIndex );
+}
+
+Gaffer::StringPlug *CSGLevelSets::vdbLocationPlug()
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
 
-const Gaffer::StringPlug *CSGGrids::vdbLocationPlug() const
+const Gaffer::StringPlug *CSGLevelSets::vdbLocationPlug() const
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 1);
 }
 
-Gaffer::StringPlug *CSGGrids::gridPlug()
+Gaffer::StringPlug *CSGLevelSets::gridPlug()
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
-const Gaffer::StringPlug *CSGGrids::gridPlug() const
+const Gaffer::StringPlug *CSGLevelSets::gridPlug() const
 {
 	return  getChild<StringPlug>( g_firstPlugIndex + 2 );
 }
 
-Gaffer::IntPlug *CSGGrids::operationPlug()
+Gaffer::StringPlug *CSGLevelSets::outputGridPlug()
 {
-	return  getChild<IntPlug>( g_firstPlugIndex + 3 );
+    return  getChild<StringPlug>( g_firstPlugIndex + 3 );
 }
 
-const Gaffer::IntPlug *CSGGrids::operationPlug() const
+const Gaffer::StringPlug *CSGLevelSets::outputGridPlug() const
 {
-	return  getChild<IntPlug>( g_firstPlugIndex + 3 );
+    return  getChild<StringPlug>( g_firstPlugIndex + 3 );
 }
 
-void CSGGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+Gaffer::IntPlug *CSGLevelSets::operationPlug()
+{
+	return  getChild<IntPlug>( g_firstPlugIndex + 4 );
+}
+
+const Gaffer::IntPlug *CSGLevelSets::operationPlug() const
+{
+	return  getChild<IntPlug>( g_firstPlugIndex + 4 );
+}
+
+void CSGLevelSets::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
-	if( input == operationPlug() || input->parent() == otherPlug() || input == gridPlug() || input == vdbLocationPlug() )
+	if(
+	    input == operationPlug() ||
+	    input->parent() == otherPlug() ||
+	    input == gridPlug() ||
+	    input == vdbLocationPlug() ||
+	    input == outputGridPlug() )
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 		outputs.push_back( outPlug()->boundPlug() );
 	}
 }
 
-bool CSGGrids::processesObject() const
+bool CSGLevelSets::processesObject() const
 {
 	return true;
 }
 
-void CSGGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void CSGLevelSets::hashProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedObject( path, context, h );
 
@@ -145,6 +161,7 @@ void CSGGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Context
 	h.append( otherPlug()->objectHash( otherPath ) );
 	h.append( gridPlug()->hash() );
 	h.append( vdbLocationPlug()->hash() );
+	h.append( outputGridPlug()->hash() );
 }
 
 template<template<typename> class F>
@@ -259,7 +276,7 @@ public:
 };
 
 
-IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
+IECore::ConstObjectPtr CSGLevelSets::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	const VDBObject *vdbObjectA = runTimeCast<const VDBObject>(inputObject.get());
 	if( !vdbObjectA )
@@ -268,7 +285,7 @@ IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, 
 	}
 
 	ScenePlug::ScenePath p ;
-	ScenePlug::stringToPath(vdbLocationPlug()->getValue(), p);
+	ScenePlug::stringToPath( vdbLocationPlug()->getValue(), p );
 
 	ConstVDBObjectPtr vdbObjectB = runTimeCast<const VDBObject>( otherPlug()->object( p ) );
 
@@ -276,47 +293,59 @@ IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, 
 	{
 		return inputObject;
 	}
+	const std::string gridName = gridPlug()->getValue();
 
-	openvdb::FloatGrid::ConstPtr srcGridA =  openvdb::GridBase::constGrid<openvdb::FloatGrid>( vdbObjectA->findGrid( gridPlug()->getValue() ) );
-	openvdb::FloatGrid::ConstPtr srcGridB =  openvdb::GridBase::constGrid<openvdb::FloatGrid>( vdbObjectB->findGrid( gridPlug()->getValue() ) );
+    openvdb::FloatGrid::ConstPtr srcGridA =  openvdb::GridBase::constGrid<openvdb::FloatGrid>( vdbObjectA->findGrid( gridName ) );
+	openvdb::FloatGrid::ConstPtr srcGridB =  openvdb::GridBase::constGrid<openvdb::FloatGrid>( vdbObjectB->findGrid( gridName ) );
 
-	if (!srcGridA || !srcGridB)
+	if ( !srcGridA || !srcGridB )
 	{
 		return inputObject;
 	}
 
 	VDBObjectPtr newVDBObject = vdbObjectA->copy();
 
-
 	openvdb::FloatGrid::Ptr copyOfGridA = srcGridA->deepCopy();
 	openvdb::FloatGrid::Ptr copyOfGridB = srcGridB->deepCopy();
 
     Interrupter interrupter( context->canceller() );
+
+    Context::EditableScope scope( context );
+    scope.set( IECore::InternedString("grid"), gridName );
+    const std::string outGridName = context->substitute( outputGridPlug()->getValue() );
 
 	switch(operationPlug()->getValue())
 	{
 		case 0:
 		{
 			Dispatcher<UnionFunctor> d;
-			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
+            auto g = d( srcGridA, srcGridB );
+            g->setName( outGridName );
+			newVDBObject->insertGrid( g );
 			break;
 		}
 		case 1:
 		{
 			Dispatcher<IntersectionFunctor> d;
-			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
+            auto g = d( srcGridA, srcGridB );
+            g->setName( outGridName );
+            newVDBObject->insertGrid( g );
 			break;
 		}
 		case 2:
 		{
 			Dispatcher<DifferenceFunctor> d;
-			newVDBObject->insertGrid( d( srcGridA, srcGridB ) );
+            auto g = d( srcGridA, srcGridB );
+            g->setName( outGridName );
+            newVDBObject->insertGrid( g );
 			break;
 		}
 		case 3:
 		{
 			Dispatcher<DifferenceFunctor> d;
-			newVDBObject->insertGrid( d( srcGridB, srcGridA ) );
+            auto g = d( srcGridB, srcGridA );
+            g->setName( outGridName );
+            newVDBObject->insertGrid( g );
 			break;
 		}
 		default:
@@ -327,19 +356,19 @@ IECore::ConstObjectPtr CSGGrids::computeProcessedObject( const ScenePath &path, 
 	return newVDBObject;
 }
 
-bool CSGGrids::processesBound() const
+bool CSGLevelSets::processesBound() const
 {
 	return true;
 }
 
-void CSGGrids::hashProcessedBound( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void CSGLevelSets::hashProcessedBound(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedBound( path, context, h );
 
 	gridPlug()->hash( h );
 }
 
-Imath::Box3f CSGGrids::computeProcessedBound( const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const
+Imath::Box3f CSGLevelSets::computeProcessedBound(const ScenePath &path, const Gaffer::Context *context, const Imath::Box3f &inputBound ) const
 {
 	// todo calculate bounds from vdb grids
 	return inputBound;

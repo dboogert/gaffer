@@ -38,27 +38,27 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.LevelSetMeasure,
+    GafferVDB.FilterLevelSet,
     'description',
-    """Calculate LevelSet area, volume & curvature for grids""",
+    """Filter VDB LevelSets""",
     plugs={
         'grids' : [
             'description',
             """
-            Names of grids to generate measures for.
+            Names of grids to filter (info about matching rules? )
             """
         ],
-        'curvature' : [
+        'filterType' : [
             'description',
             """
-            Calculate the mean curvature of the level set. Note this is much slower than calculating area & volume
-            """
+            Type of filter
+            """,
+            "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
+            "preset:mean", 0,
+            "preset:gaussian", 1,
+            "preset:median", 2,
+            "preset:laplacian", 3,
+            "preset:meanCurvature", 4
         ],
-        'worldUnits' : [
-            'description',
-            """
-            Calculate the metrics using world space units instead of index space.
-            """
-        ]
     }
 )
