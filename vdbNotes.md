@@ -70,10 +70,25 @@ ScatterPointsInVolume
     - grid selector
     
     
+Nodes to make:
+
+   AdvectGrids
+   CompositeGrids
+   IntersectGrids
+   FractureLevelSets
+   MorphLevelSets
+   LevelSetPrimitive
+    
+   OffsetLevelSet 
+        Interrupt
+        outputGrid   
+  
 use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
 FilterGrids - disable doesn't pass through input vdb
 grid naming attribute ${grid} context variable 
 consistent grid naming using a context variable evaluation
+
+Merge this goodness into my VDB work : dboogert:OSLVDB
 
 Add mask to filtering and morphology            
 Copy grids from one VDB into another
