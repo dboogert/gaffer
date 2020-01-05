@@ -231,6 +231,11 @@ IECore::ConstObjectPtr SampleGrids::computeProcessedObject(const ScenePath &path
             // todo convert template for openvdb <-> imath types
             openvdb::FloatGrid::ValueType worldValue = sampler.wsSample(openvdb::Vec3R(positionView[i][0], positionView[i][1], positionView[i][2]));
             newPrimvarData->writable().push_back(worldValue);
+
+            if ( i % 1024 == 0)
+            {
+                IECore::Canceller::check( context->canceller() );
+            }
         }
 
         // todo think about overwriting existing primvar data

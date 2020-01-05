@@ -50,15 +50,15 @@
 namespace GafferVDB
 {
 
-	class GAFFERVDB_API LevelSetFracture : public GafferScene::SceneElementProcessor
+	class GAFFERVDB_API FractureLevelSets : public GafferScene::SceneElementProcessor
 	{
 
 	public :
 
-		LevelSetFracture(const std::string &name = defaultName<LevelSetFracture>() );
-		~LevelSetFracture();
+		FractureLevelSets(const std::string &name = defaultName<FractureLevelSets>() );
+		~FractureLevelSets();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::LevelSetFracture, LevelSetFractureTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::FractureLevelSets, LevelSetFractureTypeId, GafferScene::SceneElementProcessor );
 
 		Gaffer::StringPlug *gridsPlug();
 		const Gaffer::StringPlug *gridsPlug() const;
@@ -77,7 +77,7 @@ namespace GafferVDB
 		static size_t g_firstPlugIndex;
 	};
 
-	IE_CORE_DECLAREPTR( LevelSetFracture )
+	IE_CORE_DECLAREPTR(FractureLevelSets )
 
 } // namespace GafferVDB
 

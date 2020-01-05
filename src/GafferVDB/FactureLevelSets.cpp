@@ -34,7 +34,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "GafferVDB/LevelSetFracture.h"
+#include "GafferVDB/FractureLevelSets.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -58,11 +58,11 @@ using namespace Gaffer;
 using namespace GafferScene;
 using namespace GafferVDB;
 
-IE_CORE_DEFINERUNTIMETYPED( LevelSetFracture );
+IE_CORE_DEFINERUNTIMETYPED(FractureLevelSets );
 
-size_t LevelSetFracture::g_firstPlugIndex = 0;
+size_t FractureLevelSets::g_firstPlugIndex = 0;
 
-LevelSetFracture::LevelSetFracture( const std::string &name )
+FractureLevelSets::FractureLevelSets(const std::string &name )
 		: SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
@@ -73,21 +73,21 @@ LevelSetFracture::LevelSetFracture( const std::string &name )
 	outPlug()->objectPlug()->setInput( inPlug()->objectPlug() );
 }
 
-LevelSetFracture::~LevelSetFracture()
+FractureLevelSets::~FractureLevelSets()
 {
 }
 
-Gaffer::StringPlug *LevelSetFracture::gridsPlug()
+Gaffer::StringPlug *FractureLevelSets::gridsPlug()
 {
 	return getChild<StringPlug>( g_firstPlugIndex );
 }
 
-const Gaffer::StringPlug *LevelSetFracture::gridsPlug() const
+const Gaffer::StringPlug *FractureLevelSets::gridsPlug() const
 {
 	return getChild<const StringPlug>( g_firstPlugIndex );
 }
 
-void LevelSetFracture::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
+void FractureLevelSets::affects(const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
 	SceneElementProcessor::affects( input, outputs );
 
@@ -97,12 +97,12 @@ void LevelSetFracture::affects( const Gaffer::Plug *input, AffectedPlugsContaine
 	}
 }
 
-bool LevelSetFracture::processesObject() const
+bool FractureLevelSets::processesObject() const
 {
 	return true;
 }
 
-void LevelSetFracture::hashProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
+void FractureLevelSets::hashProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
 	SceneElementProcessor::hashProcessedAttributes( path, context, h );
 
@@ -110,7 +110,7 @@ void LevelSetFracture::hashProcessedObject( const ScenePath &path, const Gaffer:
 	h.append( gridsPlug()->getValue() );
 }
 
-IECore::ConstObjectPtr LevelSetFracture::computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
+IECore::ConstObjectPtr FractureLevelSets::computeProcessedObject(const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const
 {
 	return inputObject;
 }

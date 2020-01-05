@@ -35,6 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/AdvectGrids.h"
+#include "GafferVDB/Interrupt.h"
 
 #include "IECore/StringAlgo.h"
 
@@ -73,6 +74,7 @@ AdvectGrids::AdvectGrids( const std::string &name )
     addChild ( new StringPlug( "velocityGrid", Plug::In, "vel" ) );
 
     addChild ( new StringPlug( "grids", Plug::In, "" ) );
+    addChild ( new StringPlug( "outputGrid", Plug::In, "${grid}" ) );
     addChild ( new FloatPlug( "time", Plug::In, 0.0f ) );
 }
 
@@ -120,26 +122,36 @@ const Gaffer::StringPlug *AdvectGrids::gridsPlug() const
     return getChild<const StringPlug>( g_firstPlugIndex + 3);
 }
 
+Gaffer::StringPlug *AdvectGrids::outputGridPlug()
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 4 );
+}
+
+const Gaffer::StringPlug *AdvectGrids::outputGridPlug() const
+{
+    return  getChild<StringPlug>( g_firstPlugIndex + 4 );
+}
+
 Gaffer::FloatPlug *AdvectGrids::timePlug()
 {
-    return getChild<FloatPlug>( g_firstPlugIndex + 4);
+    return getChild<FloatPlug>( g_firstPlugIndex + 5 );
 }
 
 const Gaffer::FloatPlug *AdvectGrids::timePlug() const
 {
-    return getChild<const FloatPlug>( g_firstPlugIndex + 4);
+    return getChild<const FloatPlug>( g_firstPlugIndex + 5 );
 }
-
 
 void AdvectGrids::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
 {
     SceneElementProcessor::affects( input, outputs );
 
     if ( input->parent() == velocityScenePlug()
-        ||  input == velocityLocationPlug()
-        ||  input == velocityGridPlug()
-        ||  input == gridsPlug()
-        ||  input == timePlug()
+        || input == velocityLocationPlug()
+        || input == velocityGridPlug()
+        || input == gridsPlug()
+        || input == outputGridPlug()
+        || input == timePlug()
         )
     {
         outputs.push_back( outPlug()->objectPlug() );
@@ -162,8 +174,9 @@ void AdvectGrids::hashProcessedObject( const ScenePath &path, const Gaffer::Cont
     h.append ( velocityScenePlug()->objectHash( velocityLocationPath ) );
     h.append ( velocityScenePlug()->transformHash( velocityLocationPath ) );
 
-    h.append( gridsPlug()->getValue() );
-    h.append( timePlug()->getValue() );
+    h.append( gridsPlug()->hash() );
+    h.append( outputGridPlug()->hash() );
+    h.append( timePlug()->hash() );
 
 }
 
@@ -180,13 +193,28 @@ IECore::ConstObjectPtr AdvectGrids::computeProcessedObject( const ScenePath &pat
 
     IECore::ConstObjectPtr obj = velocityScenePlug()->object( velocityLocationPath );
 
+    if ( !obj )
+    {
+        return inputObject;
+    }
+
     IECoreVDB::ConstVDBObjectPtr velocityVDBObject = runTimeCast<const VDBObject>( obj );
 
     openvdb::GridBase::ConstPtr velocityGrid = velocityVDBObject->findGrid( velocityGridPlug()->getValue() );
+    if ( !velocityGrid )
+    {
+        return inputObject;
+    }
 
     openvdb::Vec3fGrid::ConstPtr v3fGrid = openvdb::GridBase::constGrid<openvdb::Vec3fGrid>( velocityGrid );
 
-    openvdb::tools::VolumeAdvection<> volumeAdvection( *v3fGrid );
+    if ( !v3fGrid )
+    {
+        return inputObject;
+    }
+
+    Interrupter interrupter( context->canceller() );
+    openvdb::tools::VolumeAdvection<openvdb::Vec3fGrid, false, Interrupter> volumeAdvection( *v3fGrid );
 
     std::vector<std::string> gridNames = vdbObject->gridNames();
 
@@ -194,21 +222,39 @@ IECore::ConstObjectPtr AdvectGrids::computeProcessedObject( const ScenePath &pat
 
     VDBObjectPtr newVDBObject = runTimeCast<VDBObject>(vdbObject->copy());
 
-    for (const auto &gridName : gridNames )
+
+
+    for ( const auto &gridName : gridNames )
     {
-        if ( IECore::StringAlgo::matchMultiple( gridName, gridsToAdvect ) )
+        if ( !IECore::StringAlgo::matchMultiple( gridName, gridsToAdvect ) )
         {
-            openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
-
-            // todo support multiple grid types
-            openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
-
-            // todo there are other choices for the sampler type other than point sampler
-            openvdb::FloatGrid::Ptr dstGrid = volumeAdvection.advect<openvdb::FloatGrid, openvdb::tools::PointSampler >( *floatGrid, (double) timePlug()->getValue() );
-
-            dstGrid->setName( floatGrid->getName() + "_advect");
-            newVDBObject->insertGrid( dstGrid );
+            continue;
         }
+
+        Context::EditableScope scope( context );
+        scope.set( IECore::InternedString("grid"), gridName );
+        const std::string outGridName = context->substitute( outputGridPlug()->getValue() );
+
+        openvdb::GridBase::ConstPtr srcGrid = newVDBObject->findGrid( gridName );
+
+        // todo support multiple grid types
+        openvdb::FloatGrid::ConstPtr floatGrid = openvdb::GridBase::constGrid<openvdb::FloatGrid>( srcGrid );
+
+        if ( !floatGrid )
+        {
+            continue;
+        }
+
+        // todo there are other choices for the sampler type other than point sampler
+        openvdb::FloatGrid::Ptr dstGrid = volumeAdvection.advect<openvdb::FloatGrid, openvdb::tools::PointSampler >( *floatGrid, (double) timePlug()->getValue() );
+
+        if ( interrupter.wasInterrupted() )
+        {
+            throw IECore::Cancelled();
+        }
+
+        dstGrid->setName( outGridName );
+        newVDBObject->insertGrid( dstGrid );
     }
 
     return newVDBObject;

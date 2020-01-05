@@ -77,30 +77,30 @@ Nodes to make:
    IntersectGrids
    FractureLevelSets
    MorphLevelSets
-   LevelSetPrimitive
+   
    SetBackgroundGrids
+   PlatonicLevelSet
    SphereLevelSet
-   PlatonticLevelSet
    
    DiagnosticsGrids
-  
+   PruneGrids
+   PotentialFlow
+     
    CreateMaskGrids
     
    OffsetLevelSet 
         Interrupt
         outputGrid   
   
-  PruneGrids
-  PotentialFlow
 
 SampleGrids can't sample non scalar (float ) values
-
 Update to Deformer base
-Discuss 2nd input scene locattions 
+Discuss 2nd input scene locations 
 use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
 FilterGrids - disable doesn't pass through input vdb
 grid naming attribute ${grid} context variable 
 consistent grid naming using a context variable evaluation
+
 
 
 Add mask to filtering and morphology            
@@ -113,6 +113,7 @@ Trace rays against a level set / Volume
 Morph
     * https://www.openvdb.org/documentation/doxygen/LevelSetMorph_8h.html
 cast from different grid types
+ray march against a volume texture (render a cube)
 
 Check nodes to see what support masks
 
