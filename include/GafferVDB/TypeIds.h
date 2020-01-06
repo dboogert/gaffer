@@ -66,7 +66,8 @@ enum TypeId
     LevelSetToFogTypeId = 110971,
     SegmentGridsTypeId = 110972,
     IntersectGridsTypeId = 110973,
-	LastTypeId = 110974
+    CompositeGridsTypeId = 110974,
+	LastTypeId = CompositeGridsTypeId
 };
 
 } // namespace GafferVDB
