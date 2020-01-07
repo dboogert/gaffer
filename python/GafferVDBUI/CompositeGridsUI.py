@@ -69,8 +69,8 @@ GafferUI.Metadata.registerNode(
             "preset:min", 0,
             "preset:max", 1,
             "preset:sum", 2,
-            "preset:mul", 3
-            "preset:div", 3
+            "preset:mul", 3,
+            "preset:div", 4
         ]
     }
 )
