@@ -75,8 +75,7 @@ Nodes to make:
    PlatonicLevelSet
    SphereLevelSet
    
-   
-   IntersectVolume (fog in particular)
+   MarchVolume (fog in particular)
    
    AdvectGrids 
 
@@ -89,7 +88,7 @@ Nodes to make:
    PruneGrids
    PotentialFlow
      
-   CreateMaskGrids
+   MaskGrids
     
    OffsetLevelSet 
         Interrupt
