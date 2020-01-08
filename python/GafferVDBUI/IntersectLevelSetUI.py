@@ -38,14 +38,14 @@ import GafferUI
 import GafferVDB
 
 GafferUI.Metadata.registerNode(
-    GafferVDB.IntersectGrids,
+    GafferVDB.IntersectLevelSet,
     'description',
-    """Intersect against grids of a VDB Object.""",
+    """Intersect a Level Set grid in a VDB Object.""",
     plugs={
         'grids' : [
             'description',
             """
-            Names of grids to intersect against
+            Name of level set grid to intersect against
             """
         ]
     }

@@ -57,7 +57,7 @@
 #include "GafferVDB/ClipGrids.h"
 #include "GafferVDB/LevelSetToFog.h"
 #include "GafferVDB/SegmentLevelSets.h"
-#include "GafferVDB/IntersectGrids.h"
+#include "GafferVDB/IntersectLevelSet.h"
 #include "GafferVDB/MorphLevelSets.h"
 #include "GafferVDB/CompositeGrids.h"
 
@@ -91,7 +91,7 @@ BOOST_PYTHON_MODULE( _GafferVDB )
 	GafferBindings::DependencyNodeClass<ClipGrids>();
 	GafferBindings::DependencyNodeClass<LevelSetToFog>();
 	GafferBindings::DependencyNodeClass<SegmentLevelSets>();
-    GafferBindings::DependencyNodeClass<IntersectGrids>();
+    GafferBindings::DependencyNodeClass<IntersectLevelSet>();
     GafferBindings::DependencyNodeClass<MorphLevelSets>();
     GafferBindings::DependencyNodeClass<CompositeGrids>();
 }

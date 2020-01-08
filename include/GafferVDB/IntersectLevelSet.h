@@ -48,15 +48,15 @@
 namespace GafferVDB
 {
 
-    class GAFFERVDB_API IntersectGrids : public GafferScene::SceneElementProcessor
+    class GAFFERVDB_API IntersectLevelSet : public GafferScene::SceneElementProcessor
     {
 
     public :
 
-        IntersectGrids(const std::string &name = defaultName<IntersectGrids>() );
-        ~IntersectGrids();
+        IntersectLevelSet(const std::string &name = defaultName<IntersectLevelSet>() );
+        ~IntersectLevelSet();
 
-        IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::IntersectGrids, IntersectGridsTypeId, GafferScene::SceneElementProcessor );
+        IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::IntersectLevelSet, IntersectGridsTypeId, GafferScene::SceneElementProcessor );
 
         GafferScene::ScenePlug *otherPlug();
         const GafferScene::ScenePlug *otherPlug() const;
@@ -84,7 +84,7 @@ namespace GafferVDB
         static size_t g_firstPlugIndex;
     };
 
-    IE_CORE_DECLAREPTR( IntersectGrids )
+    IE_CORE_DECLAREPTR(IntersectLevelSet )
 
 } // namespace GafferVDB
 

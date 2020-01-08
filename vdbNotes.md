@@ -72,15 +72,18 @@ ScatterPointsInVolume
     
 Nodes to make:
 
-   AdvectGrids
-   CompositeGrids
-   IntersectGrids
+   PlatonicLevelSet
+   SphereLevelSet
+   
+   
+   IntersectVolume (fog in particular)
+   
+   AdvectGrids 
+
    FractureLevelSets
    MorphLevelSets
    
    SetBackgroundGrids
-   PlatonicLevelSet
-   SphereLevelSet
    
    DiagnosticsGrids
    PruneGrids
@@ -100,7 +103,8 @@ use transform of vdb / primitive in all nodes (remove the need to freeze transfo
 FilterGrids - disable doesn't pass through input vdb
 grid naming attribute ${grid} context variable 
 consistent grid naming using a context variable evaluation
-
+IntersectLevelSet
+    Bug in intersection code
 
 
 Add mask to filtering and morphology            

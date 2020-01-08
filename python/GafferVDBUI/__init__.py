@@ -57,7 +57,7 @@ import VolumeToSpheresUI
 import ClipGridsUI
 import LevelSetToFogUI
 import SegmentLevelSetsUI
-import IntersectGridsUI
+import IntersectLevelSetUI
 import MorphLevelSetsUI
 import CompositeGridsUI
 
