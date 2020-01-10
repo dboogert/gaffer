@@ -73,7 +73,7 @@ Gaffer.Metadata.registerNode(
 
         ],
 
-        "grid" : [
+        "iterationGrid" : [
 
             "description",
             """
@@ -96,7 +96,64 @@ Gaffer.Metadata.registerNode(
 
             "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
 
-        ]
+        ],
+        "outputGrids" : [
+
+            "description",
+            """
+            Define grids to output by adding child plugs and connecting
+            corresponding OSL shaders.  Supported plug types are :
+
+            - FloatPlug
+            - IntPlug
+            - ColorPlug
+            - V3fPlug ( outputting vector, normal or point )
+
+            If you want to add multiple outputs at once, you can also add a closure plug,
+            which can accept a connection from an OSLCode with a combined output closure.
+            """,
+            "layout:customWidget:footer:widgetType", "GafferOSLUI.OSLObjectUI._PrimitiveVariablesFooter",
+            "layout:customWidget:footer:index", -1,
+            "nodule:type", "GafferUI::CompoundNodule",
+            "noduleLayout:section", "left",
+            "noduleLayout:spacing", 0.2,
+            "plugValueWidget:type", "GafferUI.LayoutPlugValueWidget",
+
+            # Add + button for showing and hiding parameters in the GraphEditor
+            "noduleLayout:customGadget:addButton:gadgetType", "GafferOSLUI.OSLObjectUI.PlugAdder",
+
+            "layout:index", -1,
+
+        ],
+        "outputGrids.*" : [
+
+            # Although the parameters plug is positioned
+            # as we want above, we must also register
+            # appropriate values for each individual parameter,
+            # for the case where they get promoted to a box
+            # individually.
+            "noduleLayout:section", "left",
+            "nodule:type", "GafferUI::CompoundNodule",
+            "nameValuePlugPlugValueWidget:ignoreNamePlug", lambda plug : isinstance( plug["value"], GafferOSL.ClosurePlug ),
+        ],
+        "outputGrids.*.name" : [
+            "nodule:type", "",
+        ],
+        "outputGrids.*.enabled" : [
+            "nodule:type", "",
+        ],
+        "outputGrids.*.value" : [
+
+            # Although the parameters plug is positioned
+            # as we want above, we must also register
+            # appropriate values for each individual parameter,
+            # for the case where they get promoted to a box
+            # individually.
+            "noduleLayout:section", "left",
+            "nodule:type", "GafferUI::StandardNodule",
+            "noduleLayout:label", lambda plug : plug.parent().getName() if plug.typeId() == GafferOSL.ClosurePlug.staticTypeId() else plug.parent()["name"].getValue(),
+            "ui:visibleDimensions", lambda plug : 2 if hasattr( plug, "interpretation" ) and plug.interpretation() == IECore.GeometricData.Interpretation.UV else None,
+        ],
 
     }
 

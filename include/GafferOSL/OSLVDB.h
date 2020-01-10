@@ -39,6 +39,7 @@
 
 #include "GafferOSL/Export.h"
 #include "GafferOSL/TypeIds.h"
+#include "GafferOSL/OSLCode.h"
 
 #include "GafferScene/SceneElementProcessor.h"
 #include "GafferScene/ShaderPlug.h"
@@ -61,11 +62,17 @@ public :
 	GafferScene::ShaderPlug *shaderPlug();
 	const GafferScene::ShaderPlug *shaderPlug() const;
 
-    Gaffer::StringPlug *gridPlug();
-    const Gaffer::StringPlug *gridPlug() const;
+    GafferOSL::OSLCode *oslCode();
+    const GafferOSL::OSLCode *oslCode() const;
+
+    Gaffer::StringPlug *iterationGridPlug();
+    const Gaffer::StringPlug *iterationGridPlug() const;
 
     Gaffer::IntPlug *modePlug();
     const Gaffer::IntPlug *modePlug() const;
+
+    Gaffer::Plug *outputGridsPlug();
+    const Gaffer::Plug *outputGridsPlug() const;
 
 	void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
@@ -82,6 +89,12 @@ protected :
 	IECore::ConstObjectPtr computeProcessedObject( const ScenePath &path, const Gaffer::Context *context, IECore::ConstObjectPtr inputObject ) const override;
 
 private :
+
+    void outputGridAdded( const Gaffer::GraphComponent *parent, Gaffer::GraphComponent *child );
+    void outputGridRemoved( const Gaffer::GraphComponent *parent, Gaffer::GraphComponent *child );
+
+    void updateOutputGrids();
+
 
 	static size_t g_firstPlugIndex;
 };
