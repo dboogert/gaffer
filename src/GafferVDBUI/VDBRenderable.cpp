@@ -394,6 +394,7 @@ private:
 namespace GafferVDBUI
 {
 
+
 void VDBRenderable::render( IECoreGL::State *currentState ) const
 {
     const IECoreVDB::VDBObject* vdbObject = IECore::runTimeCast<const IECoreVDB::VDBObject>( m_vdbObject.get() );
@@ -403,19 +404,24 @@ void VDBRenderable::render( IECoreGL::State *currentState ) const
         return;
     }
 
-    std::vector<std::string> names = vdbObject->gridNames();
+    const auto nameList = vdbObject->gridNames();
+    const auto names = std::set<std::string>( nameList.begin(), nameList.end() ) ;
     if ( names.empty() )
     {
         return;
     }
 
-    std::string gridName = names[0];
+    std::string gridName = *names.begin();
 
     IECoreGL::VolumeGridStateComponent *volumeGridStateComponent = currentState->get<IECoreGL::VolumeGridStateComponent>();
 
     if ( volumeGridStateComponent )
     {
-        gridName = volumeGridStateComponent->value();
+        std::string requestedName = volumeGridStateComponent->value();
+        if ( names.find( requestedName ) != names.end() )
+        {
+            gridName = requestedName;
+        }
     }
 
     openvdb::GridBase::ConstPtr grid = vdbObject->findGrid( gridName );

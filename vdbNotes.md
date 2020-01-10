@@ -72,9 +72,6 @@ ScatterPointsInVolume
     
 Nodes to make:
 
-   PlatonicLevelSet
-   SphereLevelSet
-   
    MarchVolume (fog in particular)
    
    AdvectGrids

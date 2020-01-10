@@ -488,6 +488,7 @@ nodeMenu.append( "/VDB/Intersect LevelSet", GafferVDB.IntersectLevelSet, searchT
 nodeMenu.append( "/VDB/Morph LevelSets", GafferVDB.MorphLevelSets, searchText="MorphLevelSets")
 nodeMenu.append( "/VDB/Composite Grids", GafferVDB.CompositeGrids, searchText="CompositeGrids")
 nodeMenu.append( "/VDB/Platonic LevelSet", GafferVDB.PlatonicLevelSet, searchText="PlatonicLevelSet")
+nodeMenu.append( "/VDB/Sphere LevelSet", GafferVDB.SphereLevelSet, searchText="SphereLevelSet")
 # Dispatch nodes
 
 import GafferDispatch
