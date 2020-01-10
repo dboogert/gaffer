@@ -58,8 +58,11 @@ class GAFFERVDB_API OffsetLevelSet : public GafferScene::SceneElementProcessor
 
 		GAFFER_GRAPHCOMPONENT_DECLARE_TYPE(GafferVDB::OffsetLevelSet, LevelSetOffsetTypeId, GafferScene::SceneElementProcessor );
 
-		Gaffer::StringPlug *gridPlug();
-		const Gaffer::StringPlug *gridPlug() const;
+		Gaffer::StringPlug *gridsPlug();
+		const Gaffer::StringPlug *gridsPlug() const;
+
+        Gaffer::StringPlug *outputGridPlug();
+        const Gaffer::StringPlug *outputGridPlug() const;
 
 		Gaffer::FloatPlug *offsetPlug();
 		const Gaffer::FloatPlug *offsetPlug() const;

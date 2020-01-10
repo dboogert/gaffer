@@ -87,11 +87,8 @@ Nodes to make:
    PruneGrids
    PotentialFlow
      
-   MaskGrids
-    
    OffsetLevelSet 
-        Interrupt
-        outputGrid   
+        Interrupt 
   
 
 SampleGrids can't sample non scalar (float ) values

@@ -42,11 +42,17 @@ GafferUI.Metadata.registerNode(
 	'description',
 	"""Erodes or dilates a level set VDB.""",
 	plugs={
-		'grid' : [
+		'grids' : [
 			'description',
 			"""
-			Name of the level set grid to offset in the VDB object.
+			Names of the level set grids to offset in the VDB object.
 			"""
+		],
+		'outputGrid' : [
+			'description',
+			"""
+            Name of the output grid to create. The name of the input grid is stored in the context variable `${grid}`
+            """
 		],
 		'offset' : [
 			'description',
