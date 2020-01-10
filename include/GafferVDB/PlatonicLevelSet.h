@@ -56,6 +56,24 @@ namespace GafferVDB
         PlatonicLevelSet( const std::string &name=defaultName<PlatonicLevelSet>() );
         ~PlatonicLevelSet() override;
 
+        Gaffer::StringPlug *gridPlug();
+        const Gaffer::StringPlug *gridPlug() const;
+
+        Gaffer::IntPlug *facesPlug();
+        const Gaffer::IntPlug *facesPlug() const;
+
+        Gaffer::FloatPlug *scalePlug();
+        const Gaffer::FloatPlug *scalePlug() const;
+
+        Gaffer::V3fPlug *centerPlug();
+        const Gaffer::V3fPlug *centerPlug() const;
+
+        Gaffer::FloatPlug *voxelSizePlug();
+        const Gaffer::FloatPlug *voxelSizePlug() const;
+
+        Gaffer::FloatPlug *halfWidthPlug();
+        const Gaffer::FloatPlug *halfWidthPlug() const;
+
         void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
     protected :

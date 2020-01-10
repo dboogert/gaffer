@@ -67,8 +67,9 @@ enum TypeId
     SegmentGridsTypeId = 110972,
     IntersectGridsTypeId = 110973,
     CompositeGridsTypeId = 110974,
-    PlatonicLevelSetTypeId = 110975,
-	LastTypeId = PlatonicLevelSetTypeId
+    PlatonicLevelSetTypeId = 118000,
+    SphereLevelSetTypeId = 118001,
+	LastTypeId = SphereLevelSetTypeId
 };
 
 } // namespace GafferVDB

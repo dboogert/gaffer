@@ -60,7 +60,7 @@
 #include "GafferVDB/IntersectLevelSet.h"
 #include "GafferVDB/MorphLevelSets.h"
 #include "GafferVDB/CompositeGrids.h"
-
+#include "GafferVDB/PlatonicLevelSet.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -94,4 +94,5 @@ BOOST_PYTHON_MODULE( _GafferVDB )
     GafferBindings::DependencyNodeClass<IntersectLevelSet>();
     GafferBindings::DependencyNodeClass<MorphLevelSets>();
     GafferBindings::DependencyNodeClass<CompositeGrids>();
+    GafferBindings::DependencyNodeClass<PlatonicLevelSet>();
 }

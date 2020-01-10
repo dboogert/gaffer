@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#  Copyright (c) 2015, John Haddon. All rights reserved.
+#  Copyright (c) 2020, Don Boogert. All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -15,7 +15,7 @@
 #        disclaimer in the documentation and/or other materials provided with
 #        the distribution.
 #
-#      * Neither the name of John Haddon nor the names of
+#      * Neither the name of Don Boogert nor the names of
 #        any other contributors to this software may be used to endorse or
 #        promote products derived from this software without specific prior
 #        written permission.
@@ -34,32 +34,52 @@
 #
 ##########################################################################
 
-from _GafferVDBUI import *
+import GafferUI
+import GafferVDB
 
-import LevelSetToMeshUI
-import MeshToLevelSetUI
-import OffsetLevelSetUI
-import PointsGridToPointsUI
-import DeleteGridsUI
-import ScatterPointsUI
-import AdvectGridsUI
-import MathOpGridsUI
-import StatisticsGridsUI
-import CSGLevelSetsUI
-import TransformGridsUI
-import PointsToLevelSetUI
-import VDBObjectUI
-import SampleGridsUI
-import FilterGridsUI
-import MeasureLevelSetUI
-import FilterLevelSetUI
-import VolumeToSpheresUI
-import ClipGridsUI
-import LevelSetToFogUI
-import SegmentLevelSetsUI
-import IntersectLevelSetUI
-import MorphLevelSetsUI
-import CompositeGridsUI
-import PlatonicLevelSetUI
+GafferUI.Metadata.registerNode(
+    GafferVDB.PlatonicLevelSet,
+    'description',
+    """Create a platonic solid level set""",
+    plugs={
+        'grid' : [
+            'description',
+            """
+            """
+        ],
 
-__import__( "IECore" ).loadConfig( "GAFFER_STARTUP_PATHS", subdirectory = "GafferVDBUI" )
+        "faces" : [
+            "description",
+            """
+            """,
+            "plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
+            "preset:Tetrahedron", 4,
+            "preset:Cube", 6,
+            "preset:Octahedron", 8,
+            "preset:Dodecahedron", 12,
+            "preset:Icosahedron", 20,
+        ],
+
+        "scale" : [
+            "description",
+            """
+            """
+        ],
+        "center" : [
+            "description",
+            """
+            """
+        ],
+        "voxelSize" : [
+            "description",
+            """
+            """
+        ],
+        "halfWidth" : [
+            "description",
+            """
+            """
+        ],
+
+    }
+)

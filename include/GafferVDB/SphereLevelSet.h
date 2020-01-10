@@ -53,7 +53,7 @@ namespace GafferVDB
 
         IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::SphereLevelSet, GafferVDB::SphereLevelSetTypeId, ObjectSource );
 
-        SphereLevelSet( const std::string &name=defaultName<PlatonicLevelSet>() );
+        SphereLevelSet( const std::string &name=defaultName<SphereLevelSet>() );
         ~SphereLevelSet() override;
 
         void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;

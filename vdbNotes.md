@@ -77,7 +77,9 @@ Nodes to make:
    
    MarchVolume (fog in particular)
    
-   AdvectGrids 
+   AdvectGrids
+   
+   AdvectPoints?
 
    FractureLevelSets
    MorphLevelSets
