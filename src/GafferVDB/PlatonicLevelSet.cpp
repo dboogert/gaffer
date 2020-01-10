@@ -180,6 +180,7 @@ IECore::ConstObjectPtr PlatonicLevelSet::computeSource( const Context *context )
         throw IECore::Cancelled();
     }
 
+    grid->addStatsMetadata();
     grid->setName( gridPlug()->getValue() );
 
     VDBObjectPtr newVDBObject =  new VDBObject();
