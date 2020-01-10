@@ -42,7 +42,7 @@ namespace GafferVDB
 
 enum TypeId
 {
-	ClipTypeId = 110950,
+	ClipGridsTypeId = 110950,
 	VDBObjectTypeId = 110951,
     MorphLevelSetsTypeId = 110952,
 	MeshToLevelSetTypeId = 110953   ,
@@ -69,6 +69,7 @@ enum TypeId
     CompositeGridsTypeId = 110974,
     PlatonicLevelSetTypeId = 118000,
     SphereLevelSetTypeId = 118001,
+    MaskGridsTypeId = 118002,
 	LastTypeId = SphereLevelSetTypeId
 };
 

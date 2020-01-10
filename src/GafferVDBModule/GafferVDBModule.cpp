@@ -62,6 +62,7 @@
 #include "GafferVDB/CompositeGrids.h"
 #include "GafferVDB/PlatonicLevelSet.h"
 #include "GafferVDB/SphereLevelSet.h"
+#include "GafferVDB/MaskGrids.h"
 
 #include "GafferBindings/DependencyNodeBinding.h"
 
@@ -97,4 +98,5 @@ BOOST_PYTHON_MODULE( _GafferVDB )
     GafferBindings::DependencyNodeClass<CompositeGrids>();
     GafferBindings::DependencyNodeClass<PlatonicLevelSet>();
     GafferBindings::DependencyNodeClass<SphereLevelSet>();
+    GafferBindings::DependencyNodeClass<MaskGrids>();
 }

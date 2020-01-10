@@ -56,7 +56,7 @@ namespace GafferVDB
 		ClipGrids( const std::string &name = defaultName<ClipGrids>() );
 		~ClipGrids();
 
-		IE_CORE_DECLARERUNTIMETYPEDEXTENSION( GafferVDB::ClipGrids, ClipTypeId, GafferScene::SceneElementProcessor );
+		IE_CORE_DECLARERUNTIMETYPEDEXTENSION(GafferVDB::ClipGrids, ClipGridsTypeId, GafferScene::SceneElementProcessor );
 
 		GafferScene::ScenePlug *otherPlug();
 		const GafferScene::ScenePlug *otherPlug() const;
