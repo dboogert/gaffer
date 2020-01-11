@@ -41,6 +41,9 @@ import GafferUI
 
 import GafferOSL
 
+import functools
+
+
 ##########################################################################
 # Metadata
 ##########################################################################
@@ -159,3 +162,34 @@ Gaffer.Metadata.registerNode(
 
 )
 
+#########################################################################
+# primitiveVariable plug menu
+##########################################################################
+
+def __deletePlug( plug ) :
+
+    with Gaffer.UndoScope( plug.ancestor( Gaffer.ScriptNode ) ) :
+        plug.parent().removeChild( plug )
+
+def __plugPopupMenu( menuDefinition, plugValueWidget ) :
+
+    plug = plugValueWidget.getPlug()
+    if not isinstance( plug.node(), GafferOSL.OSLVDB ):
+        return
+
+    relativeName = plug.relativeName( plug.node() ).split( "." )
+    if relativeName[0] != "outputGrids" or len( relativeName ) < 2:
+        return
+
+    primVarPlug = plug.node()["outputGrids"][relativeName[1]]
+
+    menuDefinition.append( "/DeleteDivider", { "divider" : True } )
+    menuDefinition.append(
+        "/Delete",
+        {
+            "command" : functools.partial( __deletePlug, primVarPlug ),
+            "active" : not plugValueWidget.getReadOnly() and not Gaffer.MetadataAlgo.readOnly( primVarPlug ),
+        }
+    )
+
+GafferUI.PlugValueWidget.popupMenuSignal().connect( __plugPopupMenu, scoped = False )
