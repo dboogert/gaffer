@@ -329,13 +329,14 @@ OSLVDB::OSLVDB( const std::string &name )
 : SceneElementProcessor( name, IECore::PathMatcher::NoMatch )
 {
 	storeIndexOfNextChild( g_firstPlugIndex );
-	addChild( new ShaderPlug( "__shader",  Plug::In, Plug::Default & ~Plug::Serialisable ) );
-    addChild( new OSLCode( "__oslCode" ) );
-	addChild( new StringPlug( "iterationGrid", Plug::In, "surface") );
+	addChild( new GafferScene::ShaderPlug( "__shader",  Plug::In, Plug::Default & ~Plug::Serialisable ) );
+    addChild( new StringPlug( "iterationGrid", Plug::In, "surface") );
 	addChild( new IntPlug( "mode", Plug::In, 0 ) );
     addChild( new Plug( "outputGrids", Plug::In, Plug::Default & ~Plug::AcceptsInputs ) );
+    addChild( new OSLCode( "__oslCode" ) );
 
     shaderPlug()->setInput( oslCode()->outPlug() );
+
     outputGridsPlug()->childAddedSignal().connect( boost::bind( &OSLVDB::outputGridAdded, this, ::_1, ::_2 ) );
     outputGridsPlug()->childRemovedSignal().connect( boost::bind( &OSLVDB::outputGridRemoved, this, ::_1, ::_2 ) );
 
@@ -358,44 +359,44 @@ const GafferScene::ShaderPlug *OSLVDB::shaderPlug() const
 	return getChild<ShaderPlug>( g_firstPlugIndex );
 }
 
-GafferOSL::OSLCode *OSLVDB::oslCode()
-{
-    return getChild<GafferOSL::OSLCode>( g_firstPlugIndex + 1 );
-}
-
-const GafferOSL::OSLCode *OSLVDB::oslCode() const
-{
-    return getChild<GafferOSL::OSLCode>( g_firstPlugIndex + 1 );
-}
-
 Gaffer::StringPlug *OSLVDB::iterationGridPlug()
 {
-	return getChild<StringPlug>( g_firstPlugIndex + 2 );
+	return getChild<StringPlug>( g_firstPlugIndex + 1 );
 }
 
 const Gaffer::StringPlug *OSLVDB::iterationGridPlug() const
 {
-	return getChild<const StringPlug>( g_firstPlugIndex + 2 );
+	return getChild<const StringPlug>( g_firstPlugIndex + 1);
 }
 
 Gaffer::IntPlug *OSLVDB::modePlug()
 {
-	return getChild<IntPlug>( g_firstPlugIndex + 3 );
+	return getChild<IntPlug>( g_firstPlugIndex + 2 );
 }
 
 const Gaffer::IntPlug *OSLVDB::modePlug() const
 {
-	return getChild<const IntPlug>( g_firstPlugIndex + 3 );
+	return getChild<const IntPlug>( g_firstPlugIndex + 2 );
 }
 
 Gaffer::Plug *OSLVDB::outputGridsPlug()
 {
-    return getChild<Gaffer::Plug>(g_firstPlugIndex + 4);
+    return getChild<Gaffer::Plug>(g_firstPlugIndex + 3 );
 }
 
 const Gaffer::Plug *OSLVDB::outputGridsPlug() const
 {
-    return getChild<Gaffer::Plug>( g_firstPlugIndex + 4 );
+    return getChild<Gaffer::Plug>( g_firstPlugIndex + 3 );
+}
+
+GafferOSL::OSLCode *OSLVDB::oslCode()
+{
+    return getChild<GafferOSL::OSLCode>( g_firstPlugIndex + 4 );
+}
+
+const GafferOSL::OSLCode *OSLVDB::oslCode() const
+{
+    return getChild<GafferOSL::OSLCode>( g_firstPlugIndex + 4 );
 }
 
 void OSLVDB::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const
@@ -406,30 +407,6 @@ void OSLVDB::affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs
 	{
 		outputs.push_back( outPlug()->objectPlug() );
 	}
-}
-
-bool OSLVDB::acceptsInput( const Gaffer::Plug *plug, const Gaffer::Plug *inputPlug ) const
-{
-	if( !SceneElementProcessor::acceptsInput( plug, inputPlug ) )
-	{
-		return false;
-	}
-
-	if( !inputPlug )
-	{
-		return true;
-	}
-
-	if( plug == shaderPlug() )
-	{
-		if( const GafferScene::Shader *shader = runTimeCast<const GafferScene::Shader>( inputPlug->source()->node() ) )
-		{
-			const OSLShader *oslShader = runTimeCast<const OSLShader>( shader );
-			return oslShader && oslShader->typePlug()->getValue() == "osl:surface";
-		}
-	}
-
-	return true;
 }
 
 bool OSLVDB::processesBound() const
