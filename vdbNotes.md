@@ -69,39 +69,8 @@ ScatterPointsInVolume
     - float / double scalar grid
     - grid selector
     
-    
-Nodes to make:
-
-   MarchVolume (fog in particular)
-   
-   AdvectGrids
-   
-   AdvectPoints?
-
-   FractureLevelSets
-   MorphLevelSets
-   
-   SetBackgroundGrids
-   
-   DiagnosticsGrids
-   PruneGrids
-   PotentialFlow
-     
-   OffsetLevelSet 
-        Interrupt 
-  
-
-SampleGrids can't sample non scalar (float ) values
-Update to Deformer base
-Discuss 2nd input scene locations 
+ 
 use transform of vdb / primitive in all nodes (remove the need to freeze transforms)
-FilterGrids - disable doesn't pass through input vdb
-grid naming attribute ${grid} context variable 
-consistent grid naming using a context variable evaluation
-IntersectLevelSet
-    Bug in intersection code
-
-
 Add mask to filtering and morphology            
 Copy grids from one VDB into another
 Fracture levelset
