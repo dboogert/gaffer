@@ -66,7 +66,7 @@ SphereLevelSet::SphereLevelSet( const std::string &name )
     addChild( new FloatPlug( "radius", Plug::In, 1.0f, 0.0f ) );
     addChild( new V3fPlug( "center", Plug::In, V3f( 0.0f, 0.0f, 0.0f ) ) );
     addChild( new FloatPlug( "voxelSize", Plug::In, 0.1f, 0.0f ) );
-    addChild( new FloatPlug( "halfWidth", Plug::In, (float) openvdb::LEVEL_SET_HALF_WIDTH ) );
+    addChild( new FloatPlug( "halfWidth", Plug::In, (float) openvdb::LEVEL_SET_HALF_WIDTH, 0.0f ) );
 }
 
 SphereLevelSet::~SphereLevelSet()
