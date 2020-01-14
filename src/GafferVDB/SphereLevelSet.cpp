@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (c) 2018, Don Boogert. All rights reserved.
+//  Copyright (c) 2020, Don Boogert. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/SphereLevelSet.h"
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 
 #include "Gaffer/StringPlug.h"
 
@@ -63,9 +63,9 @@ SphereLevelSet::SphereLevelSet( const std::string &name )
 {
     storeIndexOfNextChild( g_firstPlugIndex );
     addChild( new StringPlug( "grid", Plug::In, "surface") );
-    addChild( new FloatPlug( "scale", Plug::In, 1.0f ) );
+    addChild( new FloatPlug( "radius", Plug::In, 1.0f, 0.0f ) );
     addChild( new V3fPlug( "center", Plug::In, V3f( 0.0f, 0.0f, 0.0f ) ) );
-    addChild( new FloatPlug( "voxelSize", Plug::In, 0.1f ) );
+    addChild( new FloatPlug( "voxelSize", Plug::In, 0.1f, 0.0f ) );
     addChild( new FloatPlug( "halfWidth", Plug::In, (float) openvdb::LEVEL_SET_HALF_WIDTH ) );
 }
 
@@ -141,8 +141,8 @@ void SphereLevelSet::affects( const Plug *input, AffectedPlugsContainer &outputs
 void SphereLevelSet::hashSource( const Gaffer::Context *context, IECore::MurmurHash &h ) const
 {
     gridPlug()->hash( h );
-    radiusPlug()->hash(h );
-    h.append( centerPlug()->hash() );
+    radiusPlug()->hash( h );
+    centerPlug()->hash( h );
     voxelSizePlug()->hash( h );
     halfWidthPlug()->hash( h );
 }
@@ -168,7 +168,7 @@ IECore::ConstObjectPtr SphereLevelSet::computeSource( const Context *context ) c
     grid->addStatsMetadata();
     grid->setName( gridPlug()->getValue() );
 
-    VDBObjectPtr newVDBObject =  new VDBObject();
+    VDBObjectPtr newVDBObject = new VDBObject();
     newVDBObject->insertGrid( grid );
 
     return newVDBObject;

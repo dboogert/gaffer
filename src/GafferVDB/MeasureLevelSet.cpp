@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/MeasureLevelSet.h"
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 #include "GafferVDB/Dispatcher.h"
 
 #include "IECore/StringAlgo.h"

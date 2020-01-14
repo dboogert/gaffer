@@ -218,7 +218,7 @@ foreach( GAFFER_LIB ${GAFFERTEST_LIB_NAMES} )
   string( TOUPPER ${GAFFER_LIB} _GAFFER_LIB )
   file( GLOB ${_GAFFER_LIB}TEST_CXX_FILES ${GAFFER_SOURCE_DIR}/src/${GAFFER_LIB}Test/*.cpp )
   file( GLOB ${_GAFFER_LIB}TEST_H_FILES ${GAFFER_SOURCE_DIR}/include/${GAFFER_LIB}Test/*.h ${GAFFER_SOURCE_DIR}/include/${GAFFER_LIB}Test/*.inl )
-  set( ${_GAFFER_LIB}TEST_CXX_MODULE_FILES ${GAFFER_SOURCE_DIR}/src/${GAFFER_LIB}TestModule/${GAFFER_LIB}TestModule.cpp)
+  file( GLOB ${_GAFFER_LIB}TEST_CXX_MODULE_FILES ${GAFFER_SOURCE_DIR}/src/${GAFFER_LIB}TestModule/*.cpp )
 endforeach()
 
 # Get binding list of files

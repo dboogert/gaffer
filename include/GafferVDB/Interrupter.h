@@ -34,8 +34,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef GAFFERVDB_INTERRUPT_H
-#define GAFFERVDB_INTERRUPT_H
+#ifndef GAFFERVDB_INTERRUPTER_H
+#define GAFFERVDB_INTERRUPTER_H
 
 #include "IECore/Canceller.h"
 
@@ -56,5 +56,5 @@ private:
 
 } // namespace GafferVDB
 
-#endif // GAFFERVDB_INTERRUPT_H
+#endif // GAFFERVDB_INTERRUPTER_H
 

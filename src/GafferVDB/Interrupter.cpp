@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 
 namespace GafferVDB
 {

@@ -37,8 +37,9 @@
 from VDBTestCase import VDBTestCase
 from MeshToLevelSetTest import MeshToLevelSetTest
 from LevelSetToMeshTest import LevelSetToMeshTest
-from LevelSetOffsetTest import LevelSetOffsetTest
+from OffsetLevelSetTest import OffsetLevelSetTest
 from PointsGridToPointsTest import PointsGridToPointsTest
+from SphereLevelSetTest import SphereLevelSetTest
 from ModuleTest import ModuleTest
 
 if __name__ == "__main__":

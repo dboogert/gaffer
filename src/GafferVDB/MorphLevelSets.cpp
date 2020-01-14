@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/MorphLevelSets.h"
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 
 #include "IECore/StringAlgo.h"
 

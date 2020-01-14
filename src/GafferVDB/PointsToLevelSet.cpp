@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/PointsToLevelSet.h"
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 
 #include "Gaffer/StringPlug.h"
 

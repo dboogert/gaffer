@@ -35,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "GafferVDB/ScatterPoints.h"
-#include "GafferVDB/Interrupt.h"
+#include "GafferVDB/Interrupter.h"
 
 #include "IECore/StringAlgo.h"
 
